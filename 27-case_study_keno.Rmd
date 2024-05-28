@@ -2,13 +2,13 @@
 
 In Keno, a player pays $1 and chooses some numbers between 1 and 80 by marking them on a Keno card.
 
-```{r nice-fig-1715, fig.cap='Keno Card', out.width='70%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-2715, fig.cap='Keno Card', out.width='70%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/keno_card.png")
 ```
 
 Then the computer randomly selects 20 numbers.  Depending on how many of the player’s numbers match (“catch”) the chosen numbers, they win different amounts of money as shown in the payoff table below. 
 
-```{r nice-fig-1716, fig.cap='Keno Payouts', out.width='90%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-2716, fig.cap='Keno Payouts', out.width='90%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/keno_payouts.png")
 ```
 

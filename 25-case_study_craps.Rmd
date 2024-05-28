@@ -9,7 +9,7 @@ set.seed(2018)
 
 In the game of craps, players can make a plethora of bets on the outcome of two dice. See the craps layout below.
 
-```{r nice-fig-1710, fig.cap='Craps Layout', out.width='80%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-2510, fig.cap='Craps Layout', out.width='80%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/craps_layout.png")
 ```
 
@@ -27,7 +27,7 @@ Thus, we expect to lose 11.1 cents on average for every 1 dollar bet on the elev
 
 The heart of craps is the passline bet. The player rolling the dice must make this bet and other players around the table may join her (or, to be contrary, may bet against her). The passline bet pays off at even money, 1:1, and is potentially a multi-roll bet. The first roll of the dice on the passline bet is called the come out roll and you win on this first roll if you roll a sum of 7 or 11 (this is called a natural) and you lose on the first roll if you roll a sum of 2, 3, or 12 (this is called craps). It helps to have an image of the sample space for rolling two dice handy. 
 
-```{r nice-fig-1711, fig.cap='Sample Space for Two Dice', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-2511, fig.cap='Sample Space for Two Dice', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/two_dice_sample_space.png")
 ```
 
@@ -37,13 +37,13 @@ You are twice as likely to win on the come out roll as to lose but notice most o
 
 We need to determine the probability of winning (ie., passing) in all of these different cases. Let's start with the case you roll a sum of 4. In the original two dice sample space below we have circled the outcomes that resolve this bet. 
 
-```{r nice-fig-1712, fig.cap='Sample Space for Two Dice for a Point of Four', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-2512, fig.cap='Sample Space for Two Dice for a Point of Four', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/two_dice_sample_space_four_or_seven.png")
 ```
 
 Since these 9 outcomes are the only ones that resolve the bet, we will ignore all occurrences of other sums and use these 9 outcomes as our new sample space as shown below. 
 
-```{r nice-fig-1713, fig.cap='Sample Space for a Point of Four', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-2513, fig.cap='Sample Space for a Point of Four', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/two_dice_sample_space_point_of_four.png")
 ```
 
@@ -55,7 +55,7 @@ $$P(not \ passing \mid point \ of \ four) = 6/9$$
 
 With a similar analysis, we can determine the probability of passing and of not passing for points of 5, 6, 8, 9, and 10. These values are shown in the table below.
 
-```{r nice-fig-1714, fig.cap='Passing and Not Passing for Different Points', out.width='50%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-2514, fig.cap='Passing and Not Passing for Different Points', out.width='50%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/craps_pass_not_pass_table.png")
 ```
 
@@ -79,7 +79,7 @@ This means that we lose about 1.4 cents for each dollar bet on the passline. Thi
 
 Recall, we win a Hardway Six bet by rolling six the hard way with double threes before rolling a six any other way or rolling a seven. The payoff is 9:1. Out of the eleven different ways this bet is resolved as shown in the image below, there is only one way to win. 
 
-```{r nice-fig-1715, fig.cap='The Hardway Six Sample Space', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-2515, fig.cap='The Hardway Six Sample Space', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/craps_hardway_six_sample_space.png")
 ```
 

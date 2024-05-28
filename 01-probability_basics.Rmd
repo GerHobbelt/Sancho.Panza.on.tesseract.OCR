@@ -14,7 +14,7 @@ Probability is the measure of the likelihood of an event. In this chapter, basic
 
 There are three cards – one blue both sides, one red on both sides, and one blue on one side and red on the other.  The cards are shuffled (both interspersed and randomly turned over) and you receive one of the three cards and it is placed face down on the table. You know only the face you see and not the color of the other side of the card.  If the other side of the card is a different color, you win $\$1$ while if the other side of the card is the same color you lose $\$1$.  
 
-```{r nice-fig-101, fig.cap='Three Card Game', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101A, fig.cap='Three Card Game', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/three_spot_card_game.png")
 ```
 
@@ -62,7 +62,7 @@ We often use function notation when describing probabilities. For a well-defined
 
 The **sample space** is a list of all possible outcomes of a probability experiment. One desirable property of a sample space description is that the simple events we use are **equally likely**, meaning all have the same probability of occurring. For example, with the experiment of tossing one die the sample space is $\{1,2,3,4,5,6\}$.
 
-```{r nice-fig-101, fig.cap='Sample Space for One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101B, fig.cap='Sample Space for One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_sample_space.png")
 ```
 
@@ -79,19 +79,19 @@ By simply determining the ratio of successes to total members of the sample spac
 
 Getting an even can occur in three ways out of six so the probability of event E is $3/6$. In probability notation we write $P(E) = 3/6$.
 
-```{r nice-fig-101, fig.cap='An Even Outcome on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101C, fig.cap='An Even Outcome on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_even.png")
 ```
 
 Getting a six occurs in only one of six ways so the probability of event S is $1/6$ and expressed in probability notation as $P(S)=1/6$.
 
-```{r nice-fig-101, fig.cap='An Outcome of Six on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101D, fig.cap='An Outcome of Six on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_six.png")
 ```
 
 Getting a number less than three can occur in two ways so the probability of event L is $2/6$ and expressed in probability notation as $P(L)=2/6$.
 
-```{r nice-fig-101, fig.cap='An Outcome Less Than Three on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101E, fig.cap='An Outcome Less Than Three on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_less_than_3.png")
 ```
 
@@ -129,13 +129,13 @@ For the experiment of tossing one die and the events defined above, we can find 
 
 The only member of the sample space that is both even and six is six itself so $P(E \ and \ S)=1/6$.
 
-```{r nice-fig-101, fig.cap='Being Both Even and a Six on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101F, fig.cap='Being Both Even and a Six on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_even_six.png")
 ```
 
 The only member of the sample space that is both even and less than three is two so $P(E \ and \ L)=1/6$.
 
-```{r nice-fig-101, fig.cap='Being Both Even and Less Than Three on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101G, fig.cap='Being Both Even and Less Than Three on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_even_less_than_3.png")
 ```
 
@@ -147,7 +147,7 @@ When two events cannot occur at the same time we say they are **mutually exclusi
 
 For the experiment of rolling one die and the events E, S, and L defined above, we see events S and L are mutually exclusive since one cannot roll a six and a number less than three at the same time on the same die. This is indicated in the diagram below showing there is no overlap.
 
-```{r nice-fig-101, fig.cap='Being Both a Six and Less Than Three on One Die Cannot Occur', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101H, fig.cap='Being Both a Six and Less Than Three on One Die Cannot Occur', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_six_less_than_3.png")
 ```
 
@@ -198,43 +198,43 @@ We consider one more way of “connecting” simple events to form a compound ev
 
 Tossing one die with the events as described above, $P(L \ | \ E)$ represents the probability of L given we know E occurred, that is, the probability of a number less than three given we know the number is even. Knowing it is even narrows down the sample space to three options, $\{2,4,6\}$.
 
-```{r nice-fig-101, fig.cap='Revised Sample Space Given it is Even on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101J, fig.cap='Revised Sample Space Given it is Even on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_given_even.png")
 ```
 
 Of those three options, only one of those is less than three, thus, $P(L \ | \ E) = 1/3$. 
 
-```{r nice-fig-101, fig.cap='Being Less Than Three Given it is Even on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101K, fig.cap='Being Less Than Three Given it is Even on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_less_than_3_given_even.png")
 ```
 
 Conditional probabilities are very important and a little more practice is in order. First, we note that the event $L \ | E$ means something different than the event $E \ | L$. To find $P(E \ | L)$ we note that given event L occurred means the new sample space has just two elements, $\{1,2\}$.
 
-```{r nice-fig-101, fig.cap='Revised Sample Space Given it is Less Than Three on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101L, fig.cap='Revised Sample Space Given it is Less Than Three on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_given_less_than_3.png")
 ```
 
 And of these two options only one is even. Thus, $P(E \ | L)=1/2$. 
 
-```{r nice-fig-101, fig.cap='Being Even Given it is Less Than Three on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101M, fig.cap='Being Even Given it is Less Than Three on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_even_given_less_than_3.png")
 ```
 
 Consider the event $ S \ | E$. Given that event E occurred we know the outcome is even so our new sample space has only three outcomes, $\{2,4,6\}$. Of these, one is a six. Thus, $P(S \ | E)=1/3$.
 
-```{r nice-fig-101, fig.cap='Being Six Given it is Even on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101N, fig.cap='Being Six Given it is Even on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_six_given_even.png")
 ```
 
 The event $E \ | S$ has a different meaning. Given that event S occurred we know the outcome was a six so the new sample space has only this one outcome, $\{6\}$, and it is even. Thus, $P(E \ | S)=1/1=1$.
 
-```{r nice-fig-101, fig.cap='Being Even Given it is a Six on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101P, fig.cap='Being Even Given it is a Six on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_even_given_six.png")
 ```
 
 To find $P(S \ | \ L)$ we restrict our sample space to the two outcomes, $\{1,2\}$, where L occurred and note that neither of them is six. Thus, $P(S \ | \ L)=0/2=0$. 
 
-```{r nice-fig-101, fig.cap='Being Six Given Less Than Three on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
+```{r nice-fig-101Q, fig.cap='Being Six Given Less Than Three on One Die', out.width='60%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/one_die_six_given_less_than_3.png")
 ```
 
