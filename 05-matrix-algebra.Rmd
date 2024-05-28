@@ -1,0 +1,547 @@
+# Matrix Algebra: A Crash Course {#matrix}
+
+*Some material in this chapter is adapted from notes [Hye Young You](https://hyeyoungyou.com) wrote for the math boot camp for the political science PhD program at Vanderbilt.*
+
+Matrix algebra is an essential tool for understanding multivariate statistics.  You are probably already familiar with matrices, at least informally.  The data representations we have worked with so far---each row an observation, each column a variable---are formatted like matrices.
+
+An introductory treatment of matrix algebra is a semester-long college course.  We don't have that long, or even half that long.  This chapter gives you the *bare minimum* you need to understand to get up and running with the matrix algebra we need for OLS with multiple covariates.  If you want to use advanced statistical methods in your research and haven't previously taken a matrix algebra or linear algebra course, I recommend taking some time this summer to catch up.  For example, MIT has its undergraduate linear algebra course [available online](https://ocw.mit.edu/courses/mathematics/18-06-linear-algebra-spring-2010/index.htm), including video lectures.
+
+
+## Vector Operations
+
+A *vector* is an ordered array.  To denote a vector $v$ of $k$ elements, we write $\mathbf{v} = (v_1, v_2, \ldots, v_k)$, or sometimes
+$$
+\mathbf{v} = \begin{pmatrix} v_1 \\ v_2 \\ \vdots \\ v_k \end{pmatrix}.
+$$
+Notice the convention of using a lowercase bold letter to denote a vector.
+When I write vectors on the whiteboard, I will instead denote them with an arrow, like $\vec{v}$.
+We will usually be dealing with vectors of real numbers.  To denote the fact that $\mathbf{v}$ is a vector of $k$ real numbers, we write $\mathbf{v} \in \mathbb{R}^k$.
+
+A vector can be multiplied by a scalar $c \in \mathbb{R}$, producing what you would expect:
+$$
+c \mathbf{v} = \begin{pmatrix} c v_1 \\ c v_2 \\ \vdots \\ c v_k \end{pmatrix}
+$$
+You can also add and subtract two vectors of the same length.[^recycling]
+$$
+\begin{aligned}
+\mathbf{u} + \mathbf{v} &= \begin{pmatrix}
+  u_1 + v_1 \\ u_2 + v_2 \\ \vdots \\ u_k + v_k
+\end{pmatrix}, \\
+\mathbf{u} - \mathbf{v} &= \begin{pmatrix}
+  u_1 - v_1 \\ u_2 - v_2 \\ \vdots \\ u_k - v_k
+\end{pmatrix}.
+\end{aligned}
+$$
+
+[^recycling]: R will let you add and subtract vectors of different lengths, via a technique called "recycling".  For example `c(1, 0) + c(1, 2, 3, 4)` will produce `c(2, 2, 4, 4)`.  This is accepted practice in R, but not in mathematical derivations.
+
+A special vector is the *zero vector*, which contains---you guessed it---all zeroes.  We write $\mathbf{0}_k$ to denote the zero vector of length $k$.  When the length of the zero vector is clear from the context, we may just write $\mathbf{0}$.
+
+The last important vector operation is the *dot product*.  The dot product of $\mathbf{u}$ and $\mathbf{v}$, written $\mathbf{u} \cdot \mathbf{v}$, is the sum of the products of the entries:
+$$
+\mathbf{u} \cdot \mathbf{v}
+=
+u_1 v_1 + u_2 v_2 + \cdots + u_k v_k
+=
+\sum_{m=1}^k u_m v_m.
+$$
+
+An important concept for regression analysis is the linear independence of a collection of vectors.  Let $\mathbf{v}_1, \ldots, \mathbf{v}_J$ be a collection of $J$ vectors, each of length $k$.  We call $\mathbf{u}$ a *linear combination* of $\mathbf{v}_1, \ldots, \mathbf{v}_J$ if we can conjure up a set of real numbers $c_1, \ldots, c_J$ to make the following statement true:
+$$
+\mathbf{u} = c_1 \mathbf{v}_1 + \cdots + c_J \mathbf{v}_J.
+$$
+A collection of vectors is *linearly independent* if the only solution to
+$$
+c_1 \mathbf{v}_1 + \cdots + c_J \mathbf{v}_J = \mathbf{0}
+$$
+is $c_1 = 0, \ldots, c_J = 0$.  Otherwise, we call the vectors *linearly dependent*.
+
+Some fun facts about linear independence:
+
+*   If any vector in $\mathbf{v}_1, \ldots, \mathbf{v}_J$ is a linear combination of the others, then these vectors are linearly dependent.
+
+*   A collection of $J$ vectors of length $k$ cannot be linearly independent if $J > k$.  In other words, given vectors of length $k$, the most that can be linearly independent of each other is $k$.
+
+*   If any $\mathbf{v}_j = \mathbf{0}$, then $\mathbf{v}_1, \ldots, \mathbf{v}_J$ are linearly dependent.  (Why?)
+
+Examples:
+$$
+\begin{gathered}
+\mathbf{v}_1 = \begin{pmatrix} 1 \\ 2 \\ 3 \end{pmatrix},
+\mathbf{v}_2 = \begin{pmatrix} 2 \\ 4 \\ 6 \end{pmatrix}; \\
+\mathbf{v}_1 = \begin{pmatrix} 1 \\ 2 \\ 3 \end{pmatrix},
+\mathbf{v}_2 = \begin{pmatrix} 1 \\ 4 \\ 9 \end{pmatrix}; \\
+\mathbf{v}_1 = \begin{pmatrix} 1 \\ 1 \\ 1 \end{pmatrix},
+\mathbf{v}_2 = \begin{pmatrix} 0 \\ 1 \\ 0 \end{pmatrix},
+\mathbf{v}_3 = \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}; \\
+\mathbf{v}_1 = \begin{pmatrix} 1 \\ 0 \\ 0 \end{pmatrix},
+\mathbf{v}_2 = \begin{pmatrix} 14 \\ 12 \\ 0 \end{pmatrix},
+\mathbf{v}_3 = \begin{pmatrix} 0 \\ -1 \\ 0 \end{pmatrix}.
+\end{gathered}
+$$
+
+
+## Matrix Operations
+
+A matrix is a two-dimensional array of numbers, with entries in rows and columns.  We call a matrix with $n$ rows and $m$ columns an $n \times m$ matrix.
+Here's an example of a $2 \times 3$ matrix:
+$$
+\mathbf{A}
+=
+\begin{bmatrix}
+  99 & 73 & 2 \\
+  13 & 40 & 41
+\end{bmatrix}
+$$
+Notice the convention of using an uppercase bold letter to denote a matrix.  Given a matrix $\mathbf{A}$, we usually write $a_{ij}$ to denote the entry in the $i$'th row and $j$'th column.  In the above example, we have $a_{13} = 2$.
+
+You can think of a vector $\mathbf{v} \in \mathbb{R}^k$ as a $1 \times k$ *row matrix* or as a $k \times 1$ *column matrix*.  Throughout this book, I will treat vectors as column matrices unless otherwise noted.
+
+Like vectors, matrices can be multipled by a scalar $c \in \mathbb{R}$.
+$$
+c \mathbf{A} =
+\begin{bmatrix}
+  c a_{11} & c a_{12} & \cdots & c a_{1m} \\
+  c a_{21} & c a_{22} & \cdots & c a_{2m} \\
+  \vdots & \vdots & \ddots & \vdots \\
+  c a_{n1} & c a_{n2} & \cdots & c a_{nm}
+\end{bmatrix}
+$$
+
+Matrices of the same dimension (i.e., both with the same number of rows $n$ and columns $m$) can be added ...
+$$
+\mathbf{A} + \mathbf{B} =
+\begin{bmatrix}
+  a_{11} + b_{11} & a_{12} + b_{12} & \cdots & a_{1m} + b_{1m} \\
+  a_{21} + b_{21} & a_{22} + b_{22} & \cdots & a_{2m} + b_{2m} \\
+  \vdots & \vdots & \ddots & \vdots \\
+  a_{n1} + b_{n1} & a_{n2} + b_{n2} & \cdots & a_{nm} + b_{nm} \\
+\end{bmatrix}
+$$
+... and subtracted ...
+$$
+\mathbf{A} - \mathbf{B} =
+\begin{bmatrix}
+  a_{11} - b_{11} & a_{12} - b_{12} & \cdots & a_{1m} - b_{1m} \\
+  a_{21} - b_{21} & a_{22} - b_{22} & \cdots & a_{2m} - b_{2m} \\
+  \vdots & \vdots & \ddots & \vdots \\
+  a_{n1} - b_{n1} & a_{n2} - b_{n2} & \cdots & a_{nm} - b_{nm} \\
+\end{bmatrix}
+$$
+
+Sometimes you will want to "rotate" an $n \times m$ matrix into an $m \times n$ one, so that the first row becomes the first column, the second row becomes the second column, and so on.  This is called the *transpose*.  I write the transpose of $\mathbf{A}$ as $\mathbf{A}^\top$, though you will often also see it written $\mathbf{A}'$.  For example:
+$$
+\mathbf{A}
+=
+\begin{bmatrix}
+  99 & 73 & 2 \\
+  13 & 40 & 41
+\end{bmatrix}
+\qquad
+\Leftrightarrow
+\qquad
+\mathbf{A}^\top =
+\begin{bmatrix}
+  99 & 13 \\
+  73 & 40 \\
+  2 & 41
+\end{bmatrix}.
+$$
+Some of the most commonly invoked properties of the transpose are:
+$$
+\begin{aligned}
+(\mathbf{A}^\top)^\top &= \mathbf{A}, \\
+(c \mathbf{A})^\top &= c \mathbf{A}^\top, \\
+(\mathbf{A} + \mathbf{B})^\top &= \mathbf{A}^\top + \mathbf{B}^\top, \\
+(\mathbf{A} - \mathbf{B})^\top &= \mathbf{A}^\top - \mathbf{B}^\top.
+\end{aligned}
+$$
+
+A matrix is *square* if it has the same number of rows as columns, i.e., it is $n \times n$.  Every matrix is special, but some kinds of square matrix are *especially* special.
+
+*   A *symmetric* matrix is equal to its transpose: $\mathbf{A} = \mathbf{A}^\top$.  Example: $$
+\begin{bmatrix}
+  1 & 10 & 100 \\
+  10 & 2 & 0.1 \\
+  100 & 0.1 & 3
+\end{bmatrix}$$
+
+*   A *diagonal* matrix contains zeroes everywhere except along the main diagonal: if $i \neq j$, then $a_{ij} = 0$.  A diagonal matrix is symmetric by definition.  Example: $$
+\begin{bmatrix}
+  1 & 0 & 0 \\
+  0 & 2 & 0 \\
+  0 & 0 & 3
+\end{bmatrix}$$
+
+*   The $n \times n$ *identity* matrix, written $\mathbf{I}_n$ (or just $\mathbf{I}$ when the size is clear from context), is the $n \times n$ diagonal matrix where each diagonal entry is 1.  Example: $$
+\begin{bmatrix}
+  1 & 0 & 0 \\
+  0 & 1 & 0 \\
+  0 & 0 & 1
+\end{bmatrix}$$
+
+And last we come to matrix multiplication.  Whereas matrix addition and subtraction are pretty intuitive, matrix multiplication is not.  Let $\mathbf{A}$ be an $n \times m$ matrix and $\mathbf{B}$ be an $m \times p$ matrix.  (Notice that the number of columns of $\mathbf{A}$ must match the number of rows of $\mathbf{B}$.)  Then $\mathbf{A} \mathbf{B}$ is an $n \times p$ matrix whose $ij$'th element is the dot product of the $i$'th row of $\mathbf{A}$ and the $j$'th column of $\mathbf{B}$:
+$$
+a_{i1} b_{1j} + a_{i2} b_{2j} + \cdots + a_{im} b_{mj}.
+$$
+Some examples might make this more clear.
+$$
+\begin{gathered}
+\mathbf{A} = \begin{bmatrix}
+  2 & 10 \\
+  0 & 1 \\
+  -1 & 5
+\end{bmatrix},
+\mathbf{B} = \begin{bmatrix}
+  1 & 4 \\
+  -1 & 10
+\end{bmatrix} \\
+\mathbf{A} \mathbf{B} = \begin{bmatrix}
+  2 \cdot 1 + 10 \cdot (-1) & 2 \cdot 4 + 10 \cdot 10 \\
+  0 \cdot 1 + 1 \cdot (-1) & 0 \cdot 4 + 1 \cdot 10 \\
+  (-1) \cdot 1 + 5 \cdot (-1) & (-1) \cdot 4 + 5 \cdot 10
+\end{bmatrix}
+= \begin{bmatrix}
+  -8 & 108 \\
+  -1 & 10 \\
+  -6 & 46
+\end{bmatrix}
+\end{gathered}
+$$
+And here's one that you'll start seeing a lot of soon.
+$$
+\begin{gathered}
+\mathbf{A} = \begin{bmatrix}
+  1 & x_{11} & x_{12} \\
+  1 & x_{21} & x_{22} \\
+  & \vdots \\
+  1 & x_{N1} & x_{N2}
+\end{bmatrix},
+\mathbf{B} = \begin{bmatrix}
+  \beta_0 \\
+  \beta_1 \\
+  \beta_2
+\end{bmatrix} \\
+\mathbf{A} \mathbf{B} = \begin{bmatrix}
+  \beta_0 + \beta_1 x_{11} + \beta_2 x_{12} \\
+  \beta_0 + \beta_1 x_{21} + \beta_2 x_{22} \\
+  \vdots \\
+  \beta_0 + \beta_1 x_{N1} + \beta_2 x_{N2}
+\end{bmatrix}
+\end{gathered}
+$$
+
+Some important properties of matrix multiplication:
+
+*   Matrix multiplication is associative: $(\mathbf{A} \mathbf{B}) \mathbf{C} = \mathbf{A} (\mathbf{B} \mathbf{C})$.
+
+*   Matrix multiplication is distributive: $\mathbf{A} (\mathbf{B} + \mathbf{C}) = \mathbf{A} \mathbf{B} + \mathbf{A} \mathbf{C}$.
+
+*   For any $n \times m$ matrix $\mathbf{A}$, we have $\mathbf{A} \mathbf{I}_m = \mathbf{I}_n \mathbf{A} = \mathbf{A}$.  In this way, the identity matrix is kind of like the matrix equivalent of the number one.  (More on this when we get to matrix inversion.)
+
+*   Matrix multiplication is *not* commutative.  In other words, $\mathbf{A} \mathbf{B} \neq \mathbf{B} \mathbf{A}$ except in very special cases (e.g., both are square and one of them is the identity matrix).
+
+    This is obvious when we're dealing with non-square matrices.  Let $\mathbf{A}$ be $n \times m$ and $\mathbf{B}$ be $m \times p$, so that $\mathbf{A} \mathbf{B}$ exists.  Then $\mathbf{B} \mathbf{A}$ doesn't even exist unless $n = p$.  Even then, if $n \neq m$, then $\mathbf{A} \mathbf{B}$ is $n \times n$ and $\mathbf{B} \mathbf{A}$ is $m \times m$, so they can't possibly be the same.
+    
+    For an example that $\mathbf{A} \mathbf{B} \neq \mathbf{B} \mathbf{A}$ even for square matrices: $$\begin{gathered}
+    \mathbf{A} = \begin{bmatrix}
+      1 & 0 \\
+      2 & 0
+    \end{bmatrix},
+    \mathbf{B} = \begin{bmatrix}
+      1 & 0 \\
+      0 & 0
+    \end{bmatrix}, \\
+    \mathbf{A} \mathbf{B} = \begin{bmatrix}
+      1 & 0 \\
+      2 & 0
+    \end{bmatrix},
+    \mathbf{B} \mathbf{A} = \begin{bmatrix}
+      1 & 0 \\
+      0 & 0
+    \end{bmatrix}.
+    \end{gathered}
+    $$
+
+*   The transpose of the product is the product of the transposes ... but the other way around: $(\mathbf{A} \mathbf{B})^\top = \mathbf{B}^\top \mathbf{A}^\top$.
+
+    Here's the intuition behind this weird-seeming property.  Suppose $\mathbf{A}$ is $n \times m$ and $\mathbf{B}$ is $m \times p$.  Then $\mathbf{A} \mathbf{B}$ is $n \times p$, so $(\mathbf{A} \mathbf{B})^\top$ should be $p \times n$.  Therefore, $\mathbf{B}^\top$ must come first.
+
+
+## Matrix Inversion
+
+We've covered matrix addition, subtraction, and multiplication.  What about division?
+
+Let's think about division of real numbers for a second.  We know that any division problem can be rewritten as a multiplication problem,
+$$
+\frac{a}{b} = a \times \frac{1}{b} = a \times b^{-1},
+$$
+where $b^{-1}$ is the unique real number such that
+$$
+b \times b^{-1} = b^{-1} \times b = 1.
+$$
+
+Similarly, in matrix algebra, we say that the $n \times n$ matrix $\mathbf{C}$ is an *inverse* of the $n \times n$ matrix $\mathbf{A}$ if $\mathbf{A} \mathbf{C} = \mathbf{C} \mathbf{A} = \mathbf{I}_n$.
+
+Some basic properties of matrix inverses:
+
+*   If $\mathbf{C}$ is an inverse of $\mathbf{A}$, then $\mathbf{A}$ is an inverse of $\mathbf{C}$.  This is immediate from the definition.
+
+*   If $\mathbf{C}$ and $\mathbf{D}$ are both inverses of $\mathbf{A}$, then $\mathbf{C} = \mathbf{D}$.  Proof: If $\mathbf{C}$ and $\mathbf{D}$ are inverses of $\mathbf{A}$, then we have
+$$
+\begin{aligned}
+\mathbf{A} \mathbf{C} = \mathbf{I}
+&\Leftrightarrow \mathbf{D} (\mathbf{A} \mathbf{C}) = \mathbf{D} \mathbf{I} \\
+&\Leftrightarrow (\mathbf{D} \mathbf{A}) \mathbf{C} = \mathbf{D} \\
+&\Leftrightarrow \mathbf{I} \mathbf{C} = \mathbf{D} \\
+&\Leftrightarrow \mathbf{C} = \mathbf{D}.
+\end{aligned}
+$$
+
+    As a consequence of this property, we write the inverse of $\mathbf{A}$, when it exists, as $\mathbf{A}^{-1}$.
+    
+*   The inverse of the inverse of $\mathbf{A}$ is $\mathbf{A}$: $(\mathbf{A}^{-1})^{-1} = \mathbf{A}$.
+    
+*   If the inverse of $\mathbf{A}$ exists, then the inverse of its transpose is the transpose of the inverse: $(\mathbf{A}^\top)^{-1} = (\mathbf{A}^{-1})^\top$.
+
+*   Matrix inversion inverts scalar multiplication: if $c \neq 0$, then $(c \mathbf{A})^{-1} = \frac{1}{c} \mathbf{A}^{-1}$.
+
+*   The identity matrix is its own inverse: $\mathbf{I}_n^{-1} = \mathbf{I}_n$.
+
+Some matrices are not *invertible*; i.e., their inverse does not exist.  As a simple example, think of
+$$
+\mathbf{A} = \begin{bmatrix}
+0 & 0 \\ 0 & 0
+\end{bmatrix}.
+$$
+The inverse of $\mathbf{A}$, were it to exist, would be a $2 \times 2$ matrix $\mathbf{C}$ such that $\mathbf{A} \mathbf{C} = \mathbf{I}_2$.
+But for all $2 \times 2$ matrices $\mathbf{C}$, we have
+$$
+\mathbf{A} \mathbf{C}
+= \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}
+\begin{bmatrix} c_{11} & c_{12} \\ c_{21} & c_{22} \end{bmatrix}
+= \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}
+\neq \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}.
+$$
+Therefore, $\mathbf{A}$ does not have an inverse.
+
+Remember that matrix inversion is kind of like division for scalar numbers.  In that light, the previous example is a generalization of the principle that you can't divide by zero.  But matrices full of zeroes are not the only ones that aren't invertible.  For instance, it may not be obvious at first glance, but the following matrix is not invertible:
+$$
+\mathbf{A} = \begin{bmatrix}
+1 & 2 \\
+2 & 4
+\end{bmatrix}.
+$$
+We know that because of the following theorem: *A square matrix is invertible if and only if its columns are linearly independent.*  In the above example, the second column is 2 times the first column, so the columns are not linearly independent, so the matrix is not invertible.
+
+Consider the general $2 \times 2$ matrix
+$$
+\mathbf{A} = \begin{bmatrix}
+a & b \\
+c & d
+\end{bmatrix}.
+$$
+We have a simple criterion for linear independence here.  In particular, the columns of $\mathbf{A}$ are linearly independent if and only if $ad \neq bc$, or $ad - bc \neq 0$.  We call this the *determinant* of the matrix, since it determines whether the matrix is invertible.[^determinants]  Moreover, if $ad - bc \neq 0$ we have
+$$
+\mathbf{A}^{-1} = \frac{1}{ad - bc} \begin{bmatrix}
+d & -b \\
+-c & a
+\end{bmatrix}.
+$$
+
+[^determinants]: On the determinants of $3 \times 3$ and larger matrices, see your friendly local linear algebra textbook.  Spoiler alert: calculating the determinant of a large matrix by hand is not fun.
+
+I'll leave it to you to convince yourself that's true.  For now, let's try a couple of examples.
+
+$$
+\begin{gathered}
+\mathbf{A} = \begin{bmatrix}
+1 & 1 \\
+0 & 1
+\end{bmatrix},
+\mathbf{A}^{-1} = \begin{bmatrix}
+1 & -1 \\
+0 & 1
+\end{bmatrix}, \\
+\mathbf{A} = \begin{bmatrix}
+4 & 6 \\
+2 & 4
+\end{bmatrix},
+\mathbf{A}^{-1} = \begin{bmatrix}
+1 & -1.5 \\
+-0.5 & 1
+\end{bmatrix}, \\
+\mathbf{A} = \begin{bmatrix}
+10 & 25 \\
+4 & 10
+\end{bmatrix},
+\text{$\mathbf{A}^{-1}$ does not exist}.
+\end{gathered}
+$$
+
+
+## Solving Linear Systems
+
+You may remember from earlier math courses being asked to solve for $x_1$ and $x_2$ in systems of equations like the following one:
+$$
+\begin{aligned}
+2 x_1 + x_2 &= 10, \\
+2 x_1 - x_2 &= -10.
+\end{aligned}
+$$
+Matrix algebra lets us write this whole system as a single equation, $\mathbf{A} \mathbf{x} = \mathbf{b}$, where
+$$
+\begin{aligned}
+\mathbf{A} &= \begin{bmatrix}
+2 & 1 \\
+2 & -1
+\end{bmatrix}, \\
+\mathbf{x} &= \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}, \\
+\mathbf{b} &= \begin{bmatrix} 10 \\ -10 \end{bmatrix}.
+\end{aligned}
+$$
+
+This suggests a natural way to solve for $\mathbf{x}$: $$\mathbf{x} = \mathbf{A}^{-1} \mathbf{b}.$$  In fact, the linear system of equations $\mathbf{A} \mathbf{x} = \mathbf{b}$ has a unique solution if and only if $\mathbf{A}$ is invertible.  Otherwise, it has either zero solutions or infinitely many solutions.
+
+Example with zero solutions:
+$$
+\begin{aligned}
+x_1 + x_2 &= 1, \\
+2 x_1 + 2 x_2 &= 10.
+\end{aligned}
+$$
+
+Example with infinitely many solutions:
+$$
+\begin{aligned}
+x_1 + x_2 &= 1, \\
+2 x_1 + 2 x_2 &= 2.
+\end{aligned}
+$$
+
+
+## Appendix: Matrices in R
+
+We use the `matrix()` command to create matrices.
+
+```{r matrix}
+A <- matrix(c(2, 1, 3, 4),
+            nrow = 2,
+            ncol = 2)
+A
+```
+
+Notice that it fills "down" by column.  To fill "across" instead, use the `byrow` argument:
+
+```{r matrix-byrow}
+B <- matrix(c(2, 1, 3, 4),
+            nrow = 2,
+            ncol = 2,
+            byrow = TRUE)
+B
+```
+
+There are a few utilities for checking the dimension of a matrix.
+
+```{r matrix-dim}
+nrow(A)
+ncol(A)
+dim(A)
+```
+
+To extract the $i$'th row, $j$'th column, or $ij$'th element, use square brackets.
+
+```{r}
+A[1, ]   # 1st row
+A[, 2]   # 2nd column
+A[2, 1]  # entry in 2nd row, 1st column
+```
+
+Notice that when you extract a row or column, R turns it into a vector---the result has only a single dimension.  If you dislike this behavior (i.e., you want an extracted column to be a 1-column matrix), use the `drop = FALSE` option in the square brackets.
+
+```{r drop-false}
+A[, 2, drop = FALSE]
+```
+
+Adding and subtracting matrices works as you'd expect.
+
+```{r add-subtract}
+A + B
+A - B
+```
+
+As does scalar multiplication.
+
+```{r scalar-multiplication}
+5 * A
+-1 * B
+```
+
+However, the `*` operator performs *element-by-element* multiplication, not matrix multiplication.
+
+```{r this-is-not-matrix-multiplication}
+A * B
+```
+
+To perform matrix multiplication, use the `%*%` operator.
+
+```{r matrix-multiplication}
+A %*% B
+```
+
+To invert a matrix or solve a linear system, use the `solve()` function.
+
+```{r}
+# Invert A
+solve(A)
+
+# Solve for x in Ax = (3, 2)
+solve(A, c(3, 2))
+```
+
+Here is a not-so-fun fact about matrix inversion in R: it's not entirely exact.  To see this, let's invert a matrix with some decimal elements.
+
+```{r fpe-1}
+X <- matrix(c(1.123, 2.345, 3.456, 4.567), 2, 2)
+Y <- solve(X)
+Y
+```
+
+Now let's see what we get when we multiply `X` and `Y`.
+
+```{r fpe-2}
+X %*% Y
+```
+
+That's not an identity matrix!  The issue here is *floating point error*, the fact that decimal numbers are not stored exactly on computers.  Notice that the off-diagonal elements here, which are supposed to be exactly zero, are instead very very tiny numbers, on the order of $10^{-16}$, or 0.0000000000000001.
+
+(Another annoying thing about floating point error is that it differs across computers.  So your output when you run the above code might be slightly different than mine!)
+
+Let's check that our result is *numerically* equal to what we expected.  By numerically equal, I mean, loosely speaking, that any differences are less than the amount of error you would expect due to floating point error.  First we'll use `diag()` to generate a $2 \times 2$ identity matrix, then we'll compare numerical equality using `all.equal()`.
+
+```{r fpe-3}
+I <- diag(2)
+all.equal(X %*% Y, I)
+```
+
+Whereas the traditional `==` operator is stricter, checking for exact equality.
+
+```{r fpe-4}
+X %*% Y == I
+```
+
+Moral of the story: when comparing decimal numbers, use `all.equal()` rather than `==`.  When `all.equal()` is not `TRUE`, it returns a message indicating how far apart the numbers are.  This is annoying if you want to use `all.equal()` in, say, an `if`/`else` statement.  To get around that, we have the `isTRUE()` function.
+
+```{r all-equal}
+all.equal(1.0, 1.5)
+isTRUE(all.equal(1.0, 1.5))
+```
+
+One last thing.  If `solve()` throws an error that says "reciprocal condition number..." or "system is exactly singular", that means you tried to invert a matrix that is not invertible.
+
+```{r not-invertible, error=TRUE}
+Z <- matrix(c(1, 1, 2, 2), 2, 2)
+solve(Z)
+```
+
+

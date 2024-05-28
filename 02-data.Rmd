@@ -1,0 +1,392 @@
+# Working with Data {#data}
+
+```{r, echo=FALSE}
+options(tibble.print_min = 5)
+
+## Prevent repeated errors due to MASS masking select()
+select <- dplyr::select
+```
+
+
+*Some material in this chapter is adapted from notes [Matt DiLorenzo](http://mdilorenzo.github.io) wrote for the Spring 2016 session of PSCI 8357.*
+
+In your careers as social scientists, starting with your dissertation research---if not earlier---you will probably spend more time collecting, merging, and cleaning data than you will on statistical analysis.  So it's worth taking some time to learn how to do this well.
+
+Best practices for data management can be summarized in a single sentence: *Record and document everything you do to the data.*
+
+The first corollary of this principle is that raw data is sacrosanct.  You should never edit raw data "in place".  Once you download the raw data file, that file should never change.[^own-data]
+
+[^own-data]: Even if it's data you collected yourself, that data should still have a "canonical" representation that never gets overwritten.  See @Leek:2015uw for more on distributing your own data.
+
+In almost any non-trivial analysis, the "final" data---the format you plug into your analysis---will differ significantly from the raw data.  It may consist of information merged from multiple sources.  The variables may have been transformed, aggregated, or otherwise altered.  The unit of observation may even differ from the original source.  You must document every one of these changes, so that another researcher working from the exact same raw data will end up with the exact same final data.
+
+The most sensible way to achieve this level of reproducibility is to do all of your data merging and cleaning in a script.  In other words, no going into Excel and mucking around manually.  Like any other piece of your analysis, your pipeline from raw data to final data should follow the [principles of programming](#programming) that we discussed last week.
+
+Luckily for you,[^old-man] the **tidyverse** suite of R packages (including **dplyr**, **tidyr**, and others) makes it easy to script your "data pipeline".
+
+```{r tidyverse, message=FALSE}
+library("tidyverse")
+```
+
+[^old-man]: But not for me, because these tools didn't exist when I was a PhD student.  Yes, I am old.
+
+
+## Loading
+
+The first step in working with data is to acquire some data.  Depending on the nature of your research, you will be getting some or all of your data from sources available online.  When you download data from online repositories, you should keep track of where you got it from.  The best way to do so is---you guessed it---to script your data acquisition.
+
+The R function `download.file()` is the easiest way to download files from URLs from within R.  Just specify where you're getting the file from and where you want it to go.  For the examples today, we'll use an "untidied" version of the World Development Indicators data from the World Bank that I've posted to my website.
+
+```
+download.file(url = "http://bkenkel.com/files/untidy-data.csv",
+              destfile = "untidy-data.csv")
+```
+
+Once you've got the file stored locally, use the utilities from the **readr** package (part of **tidyverse**) to read it into R as a data frame.[^data-frame]  We have a CSV file, so we will use `read_csv`.  See `help(package = "readr")` for other possibilities.
+`read_csv` (with an underscore) is typically better than R's built-in `read.csv` (with a dot), as it reads files faster and processes them more cleanly.
+
+[^data-frame]: More precisely, the **readr** functions produce output of class `"tbl_df"` (pronounced "tibble diff," I'm told), which are like data frames but better.  See `help(package = "tibble")` for what can be done with `tbl_df`s.
+
+```{r read-csv}
+untidy_data <- read_csv(file = "untidy-data.csv")
+```
+
+Remember that each column of a data frame might be a different type, or more formally *class*, of object.  `read_csv` and its ilk try to guess the type of data each column contains: character, integer, decimal number ("double" in programming-speak), or something else.  The readout above tells you what guesses it made.  If it gets something wrong---say, reading a column as numbers that ought to be characters---you can use the `col_types` argument to set it straight.
+
+FYI, you could also run `read_csv()` directly on a URL, as in:
+
+```{r read-csv-url, eval=FALSE}
+read_csv("http://bkenkel.com/files/untidy-data.csv")
+```
+
+However, in analyses intended for publication, it's usually preferable to download and save the raw data.  What's stored at a URL might change or disappear, and you'll need to have a hard copy of the raw data for replication purposes.
+
+Now let's take a look at the data we've just loaded in.
+
+```{r head-untidy-data}
+untidy_data
+```
+
+We have a `country` variable giving country abbreviations.  The other variables are numerical values: the country's GDP in 2005, 2006, 2007, and 2008; then the same for population and unemployment.  Let's get this into a format we could use for analysis.
+
+
+## Tidying
+
+@Wickham:2014vp outlines three qualities that make data "tidy":
+
+1. Each variable forms a column.
+2. Each observation forms a row.
+3. Each type of observational unit forms a table.
+
+For one thing, this means that whether a dataset is tidy or not depends---at least in part (some data collections are messy from any angle)---on the purpose it's being analyzed for.
+
+Each row of `untidy_data` is a country.  In observational studies in comparative politics and international relations, more commonly the unit of observation is the country-year.[^inference-purists]  How can we take `untidy_data` and easily make it into country-year data?
+
+[^inference-purists]: Yes, this kind of huge cross-country analysis has fallen out of favor as we've become more attentive to causal inference.  But wait until later in the semester to worry about that!
+
+We'll use the **tidyr** package (again, part of **tidyverse**) to clean up this data.  The biggest problem right now is that each column, besides the country identifier, really encodes two pieces of information: the year of observation and the variable being observed.  To deal with this, we'll have to first transform the data from one untidy format to another.  We're going to use the `pivot_longer()` function to make each row a country-year-variable.
+
+What `pivot_longer()` does is make a row for each entry from a set of columns.  It's probably easiest to understand it by seeing it in practice:
+
+```{r pivot-longer}
+long_data <- pivot_longer(untidy_data,
+                          cols = starts_with(c("gdp", "pop", "unemp")))
+long_data
+```
+
+The `cols` argument tells `pivot_longer()` which columns to collect.
+The code here specifies that it be all of the columns starting with "gdp", "pop", or "unemp".
+As it happens, we could have achieved the same result by using `cols = ends_with(c("2005", "2006", "2007", "2008"))`.
+To select all columns, we instead would have used `cols = everything()`.
+For additional ways of selecting columns, see the help page `?tidyselect::select_helpers`.
+
+Now we have a new problem, which is that the `name` column encodes two pieces of information: the variable and the year of its observation.  **tidyr** provides the `separate()` function to solve that, splitting a single variable into two.
+
+```{r separate}
+long_data <- separate(long_data,
+                      col = "name",
+                      into = c("var", "year"))
+long_data
+```
+
+So now we have country-year-variable data, with the year and variable conveniently stored in different columns.  To turn this into country-year data, we can use the `pivot_wider()` function, which is like the inverse of `pivot_longer()`.  `pivot_wider()` takes a key column and a value column, and turns each different key into a column of its own.
+
+```{r pivot-wider}
+clean_data <- pivot_wider(long_data,
+                          names_from = "var",
+                          values_from = "value")
+clean_data
+```
+
+```{r save-clean-data, echo=FALSE}
+write_csv(clean_data, file = "clean-data.csv")
+```
+
+When using `pivot_wider()` on data that you didn't previously `pivot_longer()`, be sure to set the `values_fill` argument to tell it how to fill in empty cells.  A simple example:
+
+```{r make-test-data, echo=FALSE}
+test_data <- tribble(
+  ~id, ~name, ~value,
+  "brenton", "a", 10,
+  "brenton", "b", 20,
+  "patrick", "b", 5
+)
+```
+
+```{r values-fill}
+test_data
+pivot_wider(test_data, names_from = "name", values_from = "value")
+pivot_wider(test_data, names_from = "name", values_from = "value", values_fill = 0)
+```
+
+One more important note on **tidyverse** semantics.
+It is built to work with R's *pipe*, `|>`, which makes it easy to string together a truly mind-boggling number of commands.[^old-pipe]
+
+[^old-pipe]: Before the pipe was built directly into R, **tidyverse** included its own version, `%>%`.  So if you look on Google or Stack Overflow for code help (i.e., if you do any nontrivial coding) you might find older code---including not-yet-updated chapters of this book!---using `%>%` instead of `|>`.  Except for a few edge cases that we won't get into, both work identically.
+
+In pipe syntax, `x |> f()` is equivalent to `f(x)`.  That seems like a wasteful and confusing way to write `f(x)`, and it is.  But if you want to string together a bunch of commands, it's much easier to comprehend
+
+```{r pipe-example, eval=FALSE}
+x |>
+  f() |>
+  g() |>
+  h() |>
+  i()
+```
+
+than `i(h(g(f(x))))`.
+
+You can pass function arguments using the pipe too.  For example, `f(x, bear = "moose")` is equivalent to `x |> f(bear = "moose")`.
+
+The key thing about the **tidyverse** functions is that each of them takes a data frame as its first argument, and returns a data frame as its output.  This makes them highly amenable to piping.  For example, we can combine all three steps of our tidying above with a single command, thanks to the pipe:
+
+```{r pipe}
+untidy_data |>
+  pivot_longer(cols = starts_with(c("gdp", "pop", "unemp"))) |>
+  separate(col = "name",
+           into = c("var", "year")) |>
+  pivot_wider(names_from = "var",
+              values_from = "value")
+```
+
+Without the pipe, if we wanted to run all those commands together, we would have to write:
+
+```{r pipeless, eval=FALSE}
+pivot_wider(separate(pivot_longer(untidy_data,
+                                  cols = starts_with(c("gdp", "pop", "unemp"))),
+                     col = "name",
+                     into = c("var", "year")),
+            names_from = "var",
+            values_from = "value")
+```
+
+Going back to last week's dictum of "write programs for people": even though this would have the same computational result, it's much harder for a human (your future self or a coauthor) to parse what the code is trying to do.
+
+
+## Transforming and Aggregating
+
+Tidying the data usually isn't the end of the process.  If you want to perform further calculations on the raw, that's where the tools in **dplyr** (part of, you guessed it, the **tidyverse**) come in.
+
+Perhaps the simplest **dplyr** function (or "verb", as the R hipsters would say) is `rename()`, which lets you rename columns.
+
+```{r rename}
+clean_data |>
+  rename(gross_domestic_product = gdp)
+```
+
+The **dplyr** functions, like the vast majority of R functions, do not modify their inputs.  In other words, running `rename()` on `clean_data` will return a renamed copy of `clean_data`, but won't overwrite the original.
+
+```{r no-side-effects}
+clean_data
+```
+
+If you wanted to make the change stick, you would have to run:
+
+```{r rename-forever, eval=FALSE}
+clean_data <- clean_data |>
+  rename(gross_domestic_product = gdp)
+```
+
+`select()` lets you keep a couple of columns and drop all the others.  Or vice versa if you use minus signs.
+
+```{r select}
+clean_data |>
+  select(country, gdp)
+
+clean_data |>
+  select(-pop)
+```
+
+As we saw above, you can also select columns based on how their names start or end, or with even more complex criteria.
+See `?tidyselect::select_helpers`.
+
+```{r select-helpers}
+untidy_data |>
+  select(country, starts_with("gdp"))
+
+untidy_data |>
+  select(country, ends_with("2005"))
+```
+
+`mutate()` lets you create new variables that are transformations of old ones.
+
+```{r mutate}
+clean_data |>
+  mutate(gdppc = gdp / pop,
+         log_gdppc = log(gdppc))
+```
+
+`filter()` cuts down the data according to the logical condition(s) you specify.
+
+```{r filter}
+clean_data |>
+  filter(year == 2006)
+```
+
+`summarise()` calculates summaries of the data.  For example, let's find the maximum unemployment rate.
+
+```{r summarise}
+clean_data |>
+  summarise(max_unemp = max(unemp, na.rm = TRUE))
+```
+
+This seems sort of useless, until you combine it with the `group_by()` function.  If you group the data before `summarise`-ing it, you'll calculate a separate summary for each group.  For example, let's calculate the maximum unemployment rate for each year in the data.
+
+```{r grouped-summarise}
+clean_data |>
+  group_by(year) |>
+  summarise(max_unemp = max(unemp, na.rm = TRUE))
+```
+
+`summarise()` produces a "smaller" data frame than the input---one row per group.  If you want to do something similar, but preserving the structure of the original data, use `mutate` in combination with `group_by`.
+
+```{r grouped-mutate}
+clean_data |>
+  filter(!is.na(unemp)) |>
+  group_by(year) |>
+  mutate(max_unemp = max(unemp),
+         unemp_over_max = unemp / max_unemp) |>
+  select(country, year, contains("unemp"))
+```
+
+This gives us back the original data, but with a `max_unemp` variable recording the highest unemployment level that year.  We can then calculate each individual country's unemployment as a percentage of the maximum.  Whether grouped `mutate` or `summarise` is better depends, of course, on the purpose and structure of your analysis.
+
+
+## Merging
+
+Particularly if you do observational work, you'll often be merging together data from multiple sources.
+The key to merging data from separate tables is to have consistent identifiers across tables.  For example, if you run an experiment, you might have demographic data on each subject in one table, and each subject's response to treatment in another table.  Naturally, you'll want to have a subject identifier that "links" the records across tables, as in the following hypothetical example.
+
+```{r faux-experimental-data, echo=FALSE}
+subject_data <- tribble(
+  ~id, ~gender_id, ~loves_bernie, ~does_yoga,
+  1001, "male", "yes", "no",
+  1002, "female", "no", "yes",
+  1003, "male", "no", "no"
+)
+
+subject_response_data <- tribble(
+  ~id, ~treatment, ~response,
+  1001, "read_book", "sad",
+  1001, "watch_tv", "sad",
+  1002, "read_book", "happy",
+  1002, "watch_tv", "sad",
+  1003, "read_book", "sad",
+  1003, "watch_tv", "happy"
+)
+```
+
+```{r print-faux-data}
+subject_data
+subject_response_data
+```
+
+Let's practice merging data with our cleaned-up country-year data.  We'll take two datasets from my website: a country-level dataset with latitudes and longitudes, and a country-year--level dataset with inflation over time.
+
+```{r get-supplemental-data, message=FALSE, eval=FALSE}
+latlong_data <- read_csv("http://bkenkel.com/files/latlong.csv")
+latlong_data
+inflation_data <- read_csv("http://bkenkel.com/files/inflation.csv")
+inflation_data
+```
+
+
+<!-- fake it by loading the local files instead -->
+
+```{r get-supplemental-data-local, echo=FALSE}
+latlong_data <- read_csv("latlong.csv")
+latlong_data
+inflation_data <- read_csv("inflation.csv")
+inflation_data
+```
+
+
+For your convenience, both of these datasets use the same two-letter country naming scheme as the original data.  Unfortunately, out in the real world, data from different sources often use incommensurate naming schemes.  Converting from one naming scheme to another is part of the data cleaning process, and it requires careful attention.
+
+**tidyverse** contains various `_join()` functions for merging.  Each of these take as arguments the two data frames to merge, plus the names of the identifier variables to merge them on.  The one I use most often is `left_join()`, which keeps every row from the first ("left") data frame and merges in the columns from the second ("right") data frame.
+
+For example, let's merge the latitude and longitude data for each country into `clean_data`.
+
+```{r merge-country}
+left_join(clean_data,
+          latlong_data,
+          by = "country")
+```
+
+Since `latlong_data` is country-level, the value is the same for each year.  So the merged data contains redundant information.  This is one reason to store data observed at different levels in different tables---with redundant observations, it is easier to make errors yet harder to catch them and fix them.
+
+We can also merge data when the identifier is stored across multiple columns, as in the case of our country-year data.  But first, a technical note.[^post-hoc-download]  You might notice that the `year` column of `clean_data` is labeled `<chr>`, as in character data.  Yet the `year` column of `inflation_data` is labeled `<int>`, as in integer data.  We can check that by running `class()` on each respective column.
+
+[^post-hoc-download]: This won't be the case if you got `clean_data` by loading it in directly from `clean-data.csv` on my website, since `read_csv()` will have correctly encoded `year` as an integer.
+
+```{r check-specs}
+class(clean_data$year)
+class(inflation_data$year)
+```
+
+From R's perspective, the character string `"1999"` is a very different thing than the integer number `1999`.  Therefore, if we try to merge `clean_data` and `inflation_data` on the `year` variable, it will throw an error.
+
+```{r bad-merge, error=TRUE}
+left_join(clean_data,
+          inflation_data,
+          by = c("country", "year"))
+```
+
+To fix this, let's use `mutate()` to convert the `year` column of `clean_data` to an integer.  We probably should have done this in the first place---after all, having the year encoded as a character string would have thrown off plotting functions, statistical functions, or anything else where it would be more natural to treat the year like a number.
+
+```{r year-to-integer}
+clean_data <- mutate(clean_data,
+                     year = as.integer(year))
+clean_data
+```
+
+Looks the same as before, except with an important difference: `year` is now labeled `<int>`.
+
+Now we can merge the two datasets together without issue.  Notice how we use a vector in the `by` argument to specify multiple columns to merge on.
+
+```{r merge-country-year}
+left_join(clean_data,
+          inflation_data,
+          by = c("country", "year"))
+```
+
+You might remember that `inflation_data` contained some country-years not included in the original data (namely, observations from 2004).  If we want the merged data to use the observations from `inflation_data` rather than `clean_data`, we can use the `right_join()` function.
+
+```{r right-join}
+right_join(clean_data,
+           inflation_data,
+           by = c("country", "year"))
+```
+
+One last common issue in merging is that the identifier variables have different names in the two datasets.  If it's inconvenient or infeasible to correct this by renaming the columns in one or the other, you can specify the `by` argument as in the following example.
+
+```{r merge-different-names}
+inflation_data <- rename(inflation_data,
+                         the_country = country,
+                         the_year = year)
+inflation_data
+
+left_join(clean_data,
+          inflation_data,
+          by = c("country" = "the_country", "year" = "the_year"))
+```

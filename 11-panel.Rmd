@@ -1,0 +1,496 @@
+# Clustered and Panel Data {#panel}
+
+Grouped data structures, in which we observe individual units within larger groups, are common in political science and other social sciences.  Examples include:
+
+*   Cross-national survey data, where we observe individual respondents grouped by country.
+
+*   Block-randomized experiments.  For example, in a field experiment where the treatment is administered at the village level, we observe individual outcomes grouped by village.
+
+*   Panel data, where we observe the same units repeatedly over time.  This includes panel surveys as well as observational data on states, countries, or other political units over time.
+
+Grouped data presents problems and opportunities.  At the root of both is the idea of *unobserved heterogeneity*---that some variation across groups might be due to unobservable features of the groups.
+
+To return to our running example, suppose you are interested in the correlates of voting for Donald Trump in the 2016 general election.  You observe survey respondents grouped by state.  Vote choice might be affected by:
+
+1.  *Individual* characteristics like one's age, gender, race, income, and education.
+
+2.  *State* characteristics[^national] like the unemployment rate, undocumented population, and exposure to trade with China.
+
+Some state characteristics that might affect vote choice are difficult or impossible to measure.  For example, some states have a more cosmopolitan culture, while others have a more traditional culture.  A 50-year-old white man living in Connecticut is, we would expect, less likely to have voted for Trump than a 50-year-old white man living in Alabama.  This is *unobserved heterogeneity*---characteristics that we do not observe, and therefore cannot control for, but which affect the response.
+
+[^national]: Why did I leave out national characteristics, like inflation or the national unemployment rate?  In a single-election study, these are constant.  While they might shape variation *across* elections, they cannot be linked to variation *within* a single election.
+
+If we are not careful in dealing with grouped data, unobserved heterogeneity can be a major problem.  The spherical errors assumption is usually not tenable for grouped data, since observations will be correlated with others in the same group.  OLS will therefore be inefficient and yield invalid inferences.  Even worse, if group-level sources of unobserved heterogeneity are correlated with individual characteristics---if, say, younger voters are more likely to live in cosmopolitan states---OLS may also be biased and inconsistent.
+
+On the other hand, if we deal with grouped data properly, we can enhance the credibility of our inferences.  We can eliminate the influence of variation *across* groups, allowing us to focus on the comparisons *within* groups that we are usually most interested in.
+
+Before we get started, a note of caution.  We only have enough time to scratch the surface of how to analyze grouped data.  If you work with grouped data in your dissertation or other research, you should think carefully about your data structure and potential sources of unobserved heterogeneity.  The methods we discuss this week may not solve your problems.  As further references, I recommend @Wooldridge:2002vr and @gelman2006data.
+
+
+## The Linear Model with Grouped Data
+
+We need to change our notation a bit to reflect the arrangement of observations into groups.  Let there be $G$ groups indexed by $g = 1, \ldots, G$.  Within each group, we have $N$ observations indexed by $n = 1, \ldots, N$.[^unbalanced]  (In the special case of panel data, where each group is a unit observed over time, the standard notation is to use $t = 1, \ldots, T$ instead.)
+
+[^unbalanced]: Everything we do here would go through if we allowed the number of observations to vary across groups, but the notation would get uglier.  In the panel data context we say that the panels are *balanced* if the number of observations is the same for each group and *unbalanced* otherwise.
+
+We will now index individual "rows" of the data by $gn$, which stands for the $n$'th observation within group $g$.
+
+*   Unit-level
+    *   $Y_{gn}$: response for the $gn$'th observation
+    *   $\mathbf{x}_{gn}$: vector of $K$ covariates for the $gn$'th observation
+    *   $\epsilon_{gn}$: random shock to the $gn$'th response
+*   Group-level
+    *   $\mathbf{Y}_g$: vector of $N$ responses for the $g$'th group
+    *   $\mathbf{X}_g$: $N \times K$ matrix of covariates for the $g$'th group
+    *   $\epsilon_g$: vector of $N$ random shocks for the $g$'th group
+*   Full data
+    *   $\mathbf{Y}$: vector of all $GN$ responses, where $$\mathbf{Y} = \begin{bmatrix} \mathbf{Y}_1 \\ \mathbf{Y}_2 \\ \vdots \\ \mathbf{Y}_G \end{bmatrix}.$$
+    *   $\mathbf{X}$: $GN \times K$ matrix of covariates, where $$\mathbf{X} = \begin{bmatrix} \mathbf{X}_1 \\ \mathbf{X}_2 \\ \vdots \\ \mathbf{X}_G \end{bmatrix}.$$
+    *   $\mathbf{D}$: $GN \times G$ matrix of group membership indicators.
+    *   $\epsilon$: vector of all $GN$ random shocks
+
+If we assume a standard linear model for each $gn$'th response,
+$$
+Y_{gn} = \mathbf{x}_{gn} \cdot \beta + \epsilon_{gn},
+$$
+we end up with the familiar matrix equation
+$$
+\mathbf{Y} = \mathbf{X} \beta + \epsilon.
+$$
+
+You may look at this equation and think, "This looks like something we've used OLS on.  What's wrong with OLS?"  Two reasons.  First, at a minimum, we are unlikely to have spherical errors in grouped data.  Observations in the same group---students in the same classroom, voters in the same state, LAPOP respondents in the same country---are likely to have residual correlation.  There are unmeasured factors that commonly affect their responses.  As in any non-spherical error model, this means OLS will yield invalid inferences.  Moreover, because we are talking about autocorrelation and not just heteroskedasticity, White's heteroskedasticity-consistent standard errors won't do the trick.
+
+Second, depending on the nature of the group-specific effects, we may also have a failure of strict exogeneity.  I hope I have impressed on you by now that this is a major problem.  To see why we have a failure of strict exogeneity, let us return to the example of voters living in states with cosmopolitan versus traditional cultures.  If we cannot measure cosmopolitanism (as I am assuming), then it ends up in the error term of our model:
+$$
+\epsilon_{gn} = \text{Cosmpolitanism}_g + \text{Other Stuff}_{gn}.
+$$
+But we know that younger and more educated voters are more likely to live in cosmopolitan areas.  So if our covariate matrix includes age and education, we have
+$$
+E[\epsilon \,|\, \mathbf{X}] \neq \mathbf{0}.
+$$
+
+We will proceed from the easiest problems to the hardest.  We will first consider a standard error correction and an efficiency improvement for the case where errors are correlated within groups but strict exogeneity still holds.  We will then identify an unbiased estimator in the case where strict exogeneity fails.
+
+
+## Autocorrelation within Groups
+
+\providecommand{\Cor}{\mathop{\rm Cor}\nolimits}
+\providecommand{\se}{\mathop{\rm se}\nolimits}
+
+Imagine the following policy experiment.  The federal government randomly selects half of the states to receive a grant intended to improve high school education, while the other half do not receive it.  We observe some indicator of educational quality (e.g., graduation rates) at the school district level, where school districts are grouped within states.  So our model looks like
+$$
+\text{Quality}_{gn} = \beta_1 + \beta_2 \text{Grant}_g + \epsilon_{gn}.
+$$
+We want to know whether receiving the grant affected quality.  What we cannot measure is how well the states used the money.  If some states used it better than others, then we would expect the error term to be correlated across school districts within the state.  In a state where the money was used wisely, we would expect most of the schools to do "better than expected"---to have positive residuals, in the language of regression.  Conversely, in a state where the money was squandered, we would expect most of the schools to do worse than we would otherwise predict.
+
+This is one example of the general phenomenon Moulton [-@Moulton:1986kw; -@Moulton:1990bl] identifies---that there is often substantial correlation in the random errors within groups, especially when we are looking at the effects of variables that only vary at the group level.  One way I think about it is that, with grouped data and group-level covariates, the effective number of observations is less than the nominal number of observations.  If we use the OLS standard errors, we are pretending to have more data than we really do.  See [XKCD #2533](https://xkcd.com/2533/) for a clear illustration of this problem.
+
+Let's see a bit more formally why autocorrelation within groups would cause us to overstate the effective sample size.
+Imagine we have $N = 4$ observations organized into $G = 2$ groups, with the groups being the first two and last two observations respectively.
+Furthermore, let's assume we have a single covariate that varies across groups but not within them (e.g., a random treatment assigned at the group level), so that our data matrix looks like
+$$
+\mathbf{X} = \begin{bmatrix}
+1 & x_1 \\
+1 & x_1 \\
+1 & x_2 \\
+1 & x_2
+\end{bmatrix}.
+$$
+Finally, assume the errors are homoskedastic but are autocorrelated within groups:
+
+*   $V[\epsilon_n] = \sigma^2$ for all $n$.
+*   $\Cor[\epsilon_1, \epsilon_2] = \Cor[\epsilon_3, \epsilon_4] = \rho$.
+*   $\Cor[\epsilon_n, \epsilon_m] = 0$ for all other $n, m$ pairs.
+
+Then we can write the variance matrix of the error term as $V[\epsilon \,|\, \mathbf{X}] = \sigma^2 \Omega$, where
+$$
+\Omega = \begin{bmatrix}
+1 & \rho & 0 & 0 \\
+\rho & 1 & 0 & 0 \\
+0 & 0 & 1 & \rho \\
+0 & 0 & \rho & 1
+\end{bmatrix}.
+$$
+It turns out that the variance-covariance matrix of the OLS estimator in this case is
+$$
+V[\hat{\beta} \,|\, \mathbf{X}] = \sigma^2 (1 + \rho) (\mathbf{X}^\top \mathbf{X})^{-1}.
+$$
+Notice that this is a factor of $1 + \rho$ larger than the naive OLS formula---the one that is only valid when spherical errors is satisfied.
+(See the appendix to this chapter for how we derive this formula.)
+Therefore, if we used the regular OLS standard errors for our model, the standard error for each coefficient would be too small by a factor of $\sqrt{1 + \rho}$.
+
+This is a special case of the *Moulton factor* (see MHE 8.2.1).
+If all groups have $m$ observations, the covariate varies only at the group level, errors are homoskedastic, and the within-group correlation is $\rho$ for all groups, then the OLS standard error calculation will underestimate the true standard errors by a factor of $\sqrt{1 + (m - 1) \rho}$.
+If for some reason we were certain the homoskedasticity assumption held *and* we knew $\rho$, then we could simply correct the OLS standard errors by applying this formula.
+More broadly, if we knew the exact structure of heteroskedasticity and autocorrelation, we could obtain an efficient estimate of $\beta$ and proper standard errors by using GLS.
+Usually, however, this option will not be available to us.
+
+
+## Clustered Standard Errors
+
+Luckily, we can correct "clustered" errors in a manner similar to what we did when encountering heteroskedasticity of unknown form.  The most we can assume on $\Omega = V[\epsilon \,|\, \mathbf{X}]$ is
+
+*   Heteroskedasticity of unknown form, within and across groups.
+
+*   Autocorrelation of unknown form within groups.
+
+*   *No* autocorrelation across groups.
+
+Under these assumptions, $\Omega$ has the block-diagonal form
+$$
+\Omega = \begin{bmatrix}
+  \Omega_1 & \mathbf{0} & \cdots & \mathbf{0} \\
+  \mathbf{0} & \Omega_2 & \cdots & \mathbf{0} \\
+  \vdots & \vdots & \ddots & \vdots \\
+  \mathbf{0} & \mathbf{0} & \cdots & \Omega_G
+\end{bmatrix},
+$$
+where each $\Omega_g$ is a symmetric $N \times N$ matrix.  These may differ from each other---each group may have its own special autocorrelation structure.
+This is more general than the assumptions under which we obtained the Moulton factor above.
+
+I'll illustrate the simplest nontrivial example of a residual variance matrix with this structure.
+Imagine there are $G = 2$ groups with $N = 3$ members each.
+Let $\sigma_n^2$ denote the residual variance for each observation $n$, and let $\rho_{nm}$ denote the autocorrelation between observations $n$ and $m$.
+By definition of covariance, $\text{Cov} [\epsilon_n, \epsilon_m] = \sigma_n \sigma_m \rho_{nm}$.
+Therefore, under the assumptions above, the residual variance matrix is
+$$
+\Omega = \begin{bmatrix}
+  \sigma_1^2 & \sigma_1 \sigma_2 \rho_{12} & \sigma_1 \sigma_3 \rho_{13} & 0 & 0 & 0 \\
+  \sigma_1 \sigma_2 \rho_{12} & \sigma_2^2 & \sigma_2 \sigma_3 \rho_{23} & 0 & 0 & 0 \\
+  \sigma_1 \sigma_3 \rho_{13} & \sigma_2 \sigma_3 \rho_{23} & \sigma_3^2 & 0 & 0 & 0 \\
+  0 & 0 & 0 & \sigma_4^2 & \sigma_4 \sigma_5 \rho_{45} & \sigma_4 \sigma_6 \rho_{46} \\
+  0 & 0 & 0 & \sigma_4 \sigma_5 \rho_{45} & \sigma_5^2 & \sigma_5 \sigma_6 \rho_{56} \\
+  0 & 0 & 0 & \sigma_4 \sigma_6 \rho_{46} & \sigma_5 \sigma_6 \rho_{56} & \sigma_6^2
+\end{bmatrix}
+$$
+Here you can see the "block diagonal" structure, with the top-right and bottom-left (cross-group covariances) being filled with zeroes.
+
+If we knew $\Omega$ exactly, we could use GLS to efficiently estimate $\beta$ and obtain correct standard errors.  That is unlikely.  Instead, we will use OLS to obtain our coefficient estimates, then we will correct the standard errors so as to be approximately correct in large samples.  The *cluster-robust variance estimator* is
+$$
+\hat{\Sigma}_{\text{CR}} =
+(\mathbf{X}^\top \mathbf{X})^{-1}
+\left( \sum_{g=1}^G \mathbf{X}_g^\top \hat{e}_g \hat{e}_g^\top \mathbf{X}_g \right)
+(\mathbf{X}^\top \mathbf{X})^{-1},
+$$
+where $\hat{e}_g$ is the $N \times 1$ vector of OLS residuals for the $g$'th group.  Like White's estimator for heteroskedasticity, this is a "sandwich" estimator.  The "meat" of the sandwich here accounts for the within-group correlations in the error term.
+
+Also like White's estimator for heteroskedasticity, the cluster-robust estimator is consistent, but not unbiased.  It approaches the truth as $G$, the number of groups, grows large (holding fixed $N$, the number of observations per group), but it may be badly biased in small samples.   The consensus seems to be that $N = 50$ is large enough [@Cameron:2015ud], so you Americanists may go ahead and rejoice.  However, if you observe a small number of units over a long period of time (e.g., in a study of the historical political economy of Western European countries), the cluster-robust standard error estimator will be severely biased.  @Beck:1995hm provide a similar estimator for such data, except with the summation in the middle of the "sandwich" taken over the $N$ time periods instead of the $G$ groups.
+
+The earliest derivation of this estimator was @Liang:1986gv, and that is whom you should cite when you use it.  @Arellano:1987jx derives the same estimator but is a bit easier to follow.  As with White's estimator, there are various finite-sample corrections to $\hat{\Sigma}_{\text{CR}}$ that you may want to use; we will not go through those here.
+
+
+## Random Effects
+
+*The coverage and notation in this section and the next one closely follow  @Johnston:1997um [chapter 12].*
+
+Just as Huber-White standard errors do not fix the inefficiency of OLS under heteroskedasticity, cluster-robust standard errors do not fix the inefficiency of OLS under within-group correlation.  To get a handle on the efficiency problem, we will make further assumptions about the source of that correlation.
+
+We will assume each group $g$ has a (potentially) different intercept.  We can incorporate this into our original model,
+$$
+Y_{gn} = \mathbf{x}_{gn} \cdot \beta + \epsilon_{gn},
+$$
+by decomposing the error term into independent *group-specific* and *individual-specific* components:
+$$
+\epsilon_{gn} = \underbrace{\alpha_g}_{\text{group}} + \underbrace{\eta_{gn}}_{\text{individual}}.
+$$
+In this equation, $\alpha_g$ represents the difference between the intercept for group $g$ and the overall average, while $\eta_{gn}$ is an idiosyncratic shock specific to the $n$'th observation of group $g$.  We will assume that $\eta_{gn}$ is independent and identically distributed across observations, so that the only source of autocorrelation is that observations in the same group share the same $\alpha_g$.
+
+When we decompose the error term like this, we are assuming implicitly that the $\alpha_g$'s are uncorrelated with the covariates in the model.  Otherwise, strict exogeneity fails and the techniques that follow are useless.  Let me put that another way---the random effects model depends on the assumption that the group-specific shocks are uncorrelated with the covariates.  We will proceed under this assumption, and return shortly to the questions of testing it and what to do if it fails.
+
+The random-intercepts model gives us a convenient structure for the $\Omega$ matrix in GLS.  Let $V[\alpha_g] = \sigma^2_\alpha$ and $V[\eta_{gn}] = \sigma^2_\eta$.  The error variance matrix for the $g$'th group then works out to
+$$
+\Omega_g = \begin{bmatrix}
+\sigma_{\eta}^2 + \sigma_{\alpha}^2 & \sigma_{\alpha}^2 & \cdots & \sigma_{\alpha}^2 \\
+\sigma_{\alpha}^2 & \sigma_{\eta}^2 + \sigma_{\alpha}^2 & \cdots & \sigma_{\alpha}^2 \\
+\vdots & \vdots & \ddots & \vdots \\
+\sigma_{\alpha}^2 & \sigma_{\alpha}^2 & \cdots & \sigma_{\eta}^2 + \sigma_{\alpha}^2
+\end{bmatrix}.
+$$
+Since there is no autocorrelation across groups, $\Omega$ takes the same block-diagonal form as in our discussion of cluster-robust standard errors.
+
+If we knew $\sigma^2_\alpha$ and $\sigma^2_\eta$, we could estimate $\beta$ by GLS.  It is unlikely, however, that we would know these in advance.  Luckily, there is a compromise option available.  *Feasible GLS*, or FGLS, entails using a pair of first-stage regressions to estimate the variance of $\alpha$ and $\eta$, then plugging these into the GLS formula.
+
+There are many ways to estimate these variances.
+In practice, this isn't a problem you'll need to worry about, since the variance estimates will be computed behind the scenes by your statistical software.
+But I think it's useful to have a basic understanding of what's going on when you use random effects, so here is one simple way to estimate $\sigma^2_\alpha$ and $\sigma^2_\eta$.
+
+1.  Run OLS of $\mathbf{Y}$ on $\mathbf{X}$.
+    Let $\hat{\sigma}^2$ denote the estimated residual variance from this "pooled model"---so called because it ignores group-level variation, throwing all the observations into a single pool.
+    This is a consistent estimator of the total residual variance, $\sigma^2_\alpha + \sigma^2_\eta$.
+    
+2.  Run OLS of $\mathbf{Y}$ on $[\mathbf{X} \quad \mathbf{D}]$, i.e., the covariates plus a set of group membership indicators.
+    This is the fixed effects regression, which we will talk about shortly.
+    Because the group membership indicators account for variation *across* groups, the remaining variation in this model solely represents variance *within* groups.
+    We can therefore let the estimated residual variance from this model be $\hat{\sigma}^2_\eta$, which is a consistent estimator of the within-group variance, $\sigma^2_\eta$.
+
+3.  Estimate the between-group variance as $\hat{\sigma}^2_\alpha = \hat{\sigma}^2 - \hat{\sigma}^2_\eta$.
+
+4.  Form the matrix $\hat{\Omega}$ by plugging $\hat{\sigma}^2_\alpha$ and $\hat{\sigma}^2_\eta$ into the formulas above, then run GLS using $\hat{\Omega}$ as the weighting matrix.
+
+This gives us the *random effects estimator*,
+$$
+\hat{\beta}_{\text{RE}} = (\mathbf{X}^\top \hat{\Omega}^{-1} \mathbf{X})^{-1} \mathbf{X}^\top \hat{\Omega}^{-1} \mathbf{Y}.
+$$
+
+See @Johnston:1997um [392--395] for full formulas and details.  FGLS is consistent but not unbiased, so the random effects model may not be a good idea in small samples.  If our specification of the error structure is correct, it is asymptotically efficient---as the sample size increases, no other estimator has lower standard errors.
+
+
+## Fixed Effects
+
+What if the group-specific intercepts are correlated with the covariates?  Then, in order to maintain strict exogeneity, we must pull them out of the error term and into the covariate matrix.  This is easy to do---we can rewrite the full model as
+$$
+\mathbf{Y} = \mathbf{X} \beta + \mathbf{D} \alpha + \eta,
+$$
+where $\alpha$ is the $G \times 1$ vector of group-specific intercepts.  This suggests that we run OLS on our covariates plus the full set of group membership indicators.  (As with any set of indicators, we need to omit one category.)  The first $K$ elements of this regression constitute the *fixed effects* estimator.
+
+Most textbook treatments of fixed effect estimators go through a whole rigmarole about computation, because it used to be challenging to invert a $(K + G) \times (K + G)$ matrix when $G$ was moderately large.  This is no longer true,[^timing] so you can safely ignore most of the hand-wringing about computational difficulties.
+
+[^timing]: When I taught this class last year, I simulated a dataset with a single covariate, $N = 1{,}000$, and $J = 1{,}000$, meaning the fixed effects regression entailed estimating $1{,}001$ parameters from $1{,}000{,}000$ observations.  It took less than two minutes to run on my not-especially-powerful laptop.  That said, should you ever have $N$ another order of magnitude above that, the computational tricks given in the textbook treatments will once again be of use.
+
+The standard errors of the fixed effects estimator are usually higher than those of the random effects estimator, since estimating $G$ additional parameters uses a lot of degrees of freedom.  This leads us to the following pair of observations.
+
+*   If the random effects assumption is met (group-specific effects are uncorrelated with covariates), then the random effects and fixed estimators are both consistent, but fixed effects is less efficient.
+
+*   If the random effects assumption is not met, then the random effects estimator is inconsistent while the fixed effects estimator is consistent.
+
+The typical test for whether fixed effects are necessary comes from @Hausman:1978bi.  Under the null hypothesis that both estimators are consistent (and thus fixed effects are unnecessary and inefficient), the test statistic
+$$
+H = (\hat{\beta}_{\text{RE}} - \hat{\beta}_{\text{FE}})^\top (\hat{\Sigma}_{\text{FE}} - \hat{\Sigma}_{\text{RE}})^{-1} (\hat{\beta}_{\text{RE}} - \hat{\beta}_{\text{FE}})
+$$
+asymptotically has a $\chi^2$ distribution with $K$ degrees of freedom.
+
+The other main drawback of fixed effects estimation is that you cannot estimate the effects of variables that do not vary within groups.  (Why not?)  See @greene [section 13.5] for estimation strategies with panel data and time-invariant covariates.
+
+One final note: @Arellano:1987jx shows that the cluster-robust variance matrix estimator can be used with fixed effects.  @Cameron:2015ud recommend doing so, at least when the number of groups is large.
+
+
+## Appendix: Deriving the Moulton Factor
+
+For a general error structure $V[\epsilon \,|\, \mathbf{X}] = \sigma^2 \Omega$, the true variance of the OLS estimator is
+$$
+V[\hat{\beta} \,|\, \mathbf{X}]
+= \sigma^2 \underbrace{(\mathbf{X}^\top \mathbf{X})^{-1}}_{\text{bread}} \underbrace{\mathbf{X}^\top \Omega \mathbf{X}}_{\text{meat}} \underbrace{(\mathbf{X}^\top \mathbf{X})^{-1}}_{\text{bread}}.
+$$
+Recall that we are considering the model with $N = 4$ and
+$$
+\Omega = \begin{bmatrix}
+1 & \rho & 0 & 0 \\
+\rho & 1 & 0 & 0 \\
+0 & 0 & 1 & \rho \\
+0 & 0 & \rho & 1
+\end{bmatrix}.
+$$
+In this case, the "meat" of the OLS variance is
+$$
+\begin{aligned}
+\mathbf{X}^\top \Omega \mathbf{X}
+&= \begin{bmatrix}
+1 & 1 & 1 & 1 \\
+x_1 & x_1 & x_2 & x_2
+\end{bmatrix}
+\begin{bmatrix}
+1 & \rho & 0 & 0 \\
+\rho & 1 & 0 & 0 \\
+0 & 0 & 1 & \rho \\
+0 & 0 & \rho & 1
+\end{bmatrix}
+\begin{bmatrix}
+1 & x_1 \\
+1 & x_1 \\
+1 & x_2 \\
+1 & x_2
+\end{bmatrix} \\
+&= \begin{bmatrix}
+1 + \rho & 1 + \rho & 1 + \rho & 1 + \rho \\
+(1 + \rho) x_1 & (1 + \rho) x_1 & (1 + \rho) x_2 & (1 + \rho) x_2
+\end{bmatrix}
+\begin{bmatrix}
+1 & x_1 \\
+1 & x_1 \\
+1 & x_2 \\
+1 & x_2
+\end{bmatrix} \\
+&= (1 + \rho) \begin{bmatrix}
+1 & 1 & 1 & 1 \\
+x_1 & x_1 & x_2 & x_2
+\end{bmatrix}
+\begin{bmatrix}
+1 & x_1 \\
+1 & x_1 \\
+1 & x_2 \\
+1 & x_2
+\end{bmatrix} \\
+&= (1 + \rho) \mathbf{X}^\top \mathbf{X}.
+\end{aligned}
+$$
+Therefore, we have
+$$
+\begin{aligned}
+V[\hat{\beta} \,|\, \mathbf{X}]
+&= \sigma^2 (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \Omega \mathbf{X} (\mathbf{X}^\top \mathbf{X})^{-1} \\
+&= \sigma^2 (\mathbf{X}^\top \mathbf{X})^{-1} [(1 + \rho) \mathbf{X}^\top \mathbf{X}] (\mathbf{X}^\top \mathbf{X})^{-1} \\
+&= \sigma^2 (1 + \rho) (\mathbf{X}^\top \mathbf{X})^{-1}.
+\end{aligned}
+$$
+
+## Appendix: Implementation in R
+
+The methods introduced here can be implemented via the **plm** package.
+
+```{r packages, message=FALSE, warning=FALSE}
+library("plm")
+```
+
+We will use the `Produc` dataset from **plm**, a riveting collection of economic statistics about the U.S. states from 1970 to 1986.
+
+```{r Produc}
+data(Produc, package = "plm")
+head(Produc)
+```
+
+The functions in **plm** assume that your data are organized like `Produc`, with the grouping variable in the first column and the identification variable (time, in the case of panel data) in the second column.  See the **plm** package vignette on how to get datasets not organized this way into line.
+
+We will treat unemployment (`unemp`) as our response and public capital stock (`pcap`) and private capital stock (`pc`) as our covariates.  As a benchmark, let's use OLS.
+
+```{r lm}
+fit_ols <- lm(unemp ~ pcap + pc,
+              data = Produc)
+summary(fit_ols)
+```
+
+The "pooling" estimator implemented by `plm()` ought to give us the same results.
+
+```{r plm-pooling}
+fit_pooling <- plm(unemp ~ pcap + pc,
+                   data = Produc,
+                   model = "pooling")
+summary(fit_pooling)
+```
+
+We can obtain the cluster-robust variance matrix estimate via `vcovHC()`.  Make sure to specify `method = "arellano"` so as to get the usual estimator.  It is not entirely clear to me which of the various finite-sample adjustments corresponds to the defaults in Stata.
+
+```{r vcovHC}
+crvm_pooling <- vcovHC(fit_pooling,
+                       method = "arellano",
+                       type = "HC1")
+summary(fit_pooling, vcov = crvm_pooling)
+```
+
+Our $t$-statistics are cut in more than half, even though our variables have within-group variation (unlike @Moulton:1990bl's example).
+
+We can also use `plm()` to estimate a random-effects model.
+
+```{r random}
+fit_random <- plm(unemp ~ pcap + pc,
+                  data = Produc,
+                  model = "random")
+summary(fit_random)
+```
+
+And, finally, a fixed-effects model, which `plm()` calls the `"within"` model.
+
+```{r fixed}
+fit_fixed <- plm(unemp ~ pcap + pc,
+                 data = Produc,
+                 model = "within")
+summary(fit_fixed)
+```
+
+We can extract the fixed-effect estimates themselves via `fixef()`.
+
+```{r fixef}
+fixef(fit_fixed)
+```
+
+If we wanted to include time dummies as well, we could specify `effect = "twoways"` in the fitting function.
+
+```{r fixed-twoways}
+fit_fixed_2 <- plm(unemp ~ pcap + pc,
+                   data = Produc,
+                   effect = "twoways",
+                   model = "within")
+summary(fit_fixed_2)
+fixef(fit_fixed_2, effect = "time")
+```
+
+`phtest()` implements the Hausman test.  Remember that the null hypothesis is that both estimators are consistent; if we reject it, then the random effects estimator is inconsistent and we must use fixed effects.
+
+```{r hausman}
+phtest(fit_random, fit_fixed)
+```
+
+## Appendix: R-squared in plm
+
+**plm** has annoyed me---and my students---by reporting incorrect (or, generously, "idiosyncratic") $R^2$ values for models with fixed effects.
+I've seen a few instances where the $R^2$ apparently goes down after adding fixed effects to a model, which is mathematically impossible.
+
+The issue is that **plm** reports the $R^2$ as the proportion of variance explained *by the substantive covariates*, not including the fixed effects.
+This is inconsistent with usual practice.
+Here I illustrate how to calculate proper $R^2$ values while using **plm**.
+
+I'll generate some grouped data where most of the action is at the group level.
+I want there to be a lot of variation across groups, but relatively little within groups.
+This is exactly the circumstance where the true $R^2$ and the one reported by `plm` should differ the most.
+
+```{r plm-rsq-data, message=FALSE}
+library("tidyverse")
+
+## Draw group-level intercepts
+set.seed(94)
+groups <- LETTERS[1:20]
+group_means <- rnorm(length(groups), sd = 16)
+names(group_means) <- groups
+
+## Assign individual observations to groups and draw outcomes
+n_obs <- 5000
+g <- sample(groups, size = n_obs, replace = TRUE)
+x1 <- rnorm(n_obs, sd = 1)
+x2 <- rnorm(n_obs, sd = 1)
+y <- group_means[g] + x1 - x2 + rnorm(n_obs, sd = 4)
+
+## Arrange into format plm likes
+grouped_data <- tibble(g, x1, x2, y) %>%
+  arrange(g) %>%
+  group_by(g) %>%
+  mutate(idx = row_number()) %>%
+  ungroup() %>%
+  select(g, idx, y, x1, x2)
+
+grouped_data
+```
+
+If we run a fixed effects model "by hand" by just plugging the group dummies into `lm`, we get the correct (high) $R^2$.
+
+```{r fe-by-lm}
+fit_fe_lm <- lm(y ~ x1 + x2 + g, data = grouped_data)
+summary(fit_fe_lm)
+```
+
+`plm` gives us the same coefficients and standard errors on the substantive variables, `x1` and `x2`, but reports a curiously different $R^2$.
+
+```{r fe-by-plm, warning=FALSE}
+fit_fe_plm <- plm(y ~ x1 + x2, data = grouped_data, model = "within")
+summary(fit_fe_plm)
+```
+
+In order to get an $R^2$ commensurate with what `lm` reports, we need to calculate the total sum of squares and residual sum of squares by hand.
+Here's how to do that.
+
+```{r rsq-by-hand}
+## Calculate total sum of squares
+TSS <- sum((y - mean(y))^2)
+
+## Calculate residual sum of squares
+RSS <- sum(residuals(fit_fe_plm)^2)
+
+correct_rsq <- 1 - (RSS / TSS)
+correct_rsq
+```
+
+Notice that this is the same as what `lm` reports.
+
+```{r is-same}
+all.equal(summary(fit_fe_lm)$r.squared, correct_rsq)
+```
+
+If the response variable (here, `y`) used for fitting is not the same as in your raw data---for example, if you are using the `subset` argument or if there is missing data---you will need to be cautious about how you calculate the TSS.

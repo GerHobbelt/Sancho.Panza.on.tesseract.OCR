@@ -1,0 +1,269 @@
+# Instrumental Variables {#instruments}
+
+How can you draw causal inferences when there are unmeasured confounding variables?
+Instrumental variables regression is a powerful way to get around strict exogeneity failures.
+But its power relies on quite stringent assumptions---conditions that are often just as implausible, if not even more so, than selection on observables.
+
+## The Wald Estimator
+
+Suppose we wanted to estimate the effect of serving in the military on one's political ideology later in life.
+
+*   Units $n = 1, \ldots, N$: Adults, age 30+
+*   Treatment $T_n \in \{0, 1\}$: Whether $n$ had served in military by age 25
+*   Outcome $Y_n \in \mathbb{R}$: Some continuous measure of ideology (higher number $\Rightarrow$ more conservative)
+    *   Potential outcome $Y_n(0)$: Ideology if didn't serve
+    *   Potential outcome $Y_n(1)$: Ideology if did serve
+
+The inferential problem here is that military service is to a large degree self-selected.
+Individuals who serve in the military differ systematically from those who don't.
+If we just compare the ideologies of those who served to those who didn't, we are not necessarily capturing the effect of military service---our estimate may reflect pre-existing differences.
+
+Luckily for us as social scientists (though maybe not for those who are selected!), some countries at some times employ military conscription by lottery.
+For example, the United States' draft for the Vietnam War randomly selected men by their birthdays.
+The randomness of draft status makes it a useful *instrument* in estimating the causal effect of military service on ideology.
+
+Let $Z_n \in \{0, 1\}$ be an indicator for whether $n$ was selected in a military draft.
+We need this to satisfy a few assumptions in order to serve as an instrument.
+
+1.  **Exogeneity.**
+    The instrument must be independent of the potential outcomes.
+    Formally, $$\Pr(Z_n = 1 \,|\, Y_n(0) = y_0, Y_n(1) = y_1) = \Pr(Z_n = 1) \qquad \text{for all $y_0, y_1$}.$$
+    
+    This assumption will hold as long as draft status was truly randomly assigned.
+    If, for example, they had re-rolled the birthday picked in order to avoid the president's nephew being selected, then draft status would no longer be exogenous.^[A more subtle point: This is why it's better to define the instrument as whether one's number came up, not as whether one actually enlisted as a conscript.  If there were non-random differences in who's able to get a medical or educational deferral, then actual enlistment would be endogenous, even though "your draft number coming up" would still be exogenous.]
+    
+2.  **First stage.**
+    The instrument must affect treatment assignment.
+    Formally, $$\Pr(T_n = 1 \,|\, Z_n = 1) \neq \Pr(T_n = 1 \,|\, Z_n = 0).$$
+    
+    In the case of draft status, it is pretty obvious that being conscripted affects one's chances of enlisting in the military.
+    The first stage assumption is trickier in other applications of instrumental variables, where the instrument's effect on treatment assignment is close to zero.
+    This is known as the *weak instruments* problem.
+    
+3.  **Exclusion restriction.**
+    The instrument must affect the outcome *solely* through its effect on treatment assignment.
+    To formalize this assumption, let us now write the potential outcomes as a function of both the instrument and treatment assignment, $Y_n(Z_n, T_n)$.
+    The condition is $$Y_n(0, T_n) = Y_n(1, T_n) \qquad \text{for all $T_n$}.$$
+    
+    This is usually the hardest assumption to justify.
+    In the present example, you might argue that being drafted could increase a person's resentment toward coercive state authority, even if that person ultimately doesn't end up serving in the military.
+    This type of direct causal link between the instrument and the outcome would break everything we're about to do.
+    For purposes of illustration, we will assume that the exclusion restriction indeed holds in our example.
+    But if you want to publish papers using instrumental variables, you will need to spend a *lot* of brainpower thinking through---and defending---the exclusion restriction assumption.
+
+We're going to make one more assumption for this example to make the math easier.
+We will assume a constant treatment effect across units, $$Y_n(1) - Y_n(0) = \theta \qquad \text{for all $n$}.$$
+Unlike the assumptions enumerated above, this one isn't a core condition for instrumental variables to "work".
+It just allows us to interpret our estimate as a population average treatment effect.
+Next semester, in Stat III, you will talk at length about how to interpret instrumental variables estimates when there is variation in the unit-level treatment effects.
+
+Let's think about the average difference in ideology between those who were drafted and those who were not:
+$$
+\begin{aligned}
+\mathbb{E} [Y_n \,|\, Z_n = 1] - \mathbb{E} [Y_n \,|\, Z_n = 0]
+&= \left[ Y_n(1) \Pr(T_n = 1 \,|\, Z_n = 1) + Y_n(0) (1 - \Pr(T_n = 1 \,|\, Z_n = 1)) \right] \\
+&\quad - \left[ Y_n(1) \Pr(T_n = 1 \,|\, Z_n = 0) + Y_n(0) (1 - \Pr(T_n = 1 \,|\, Z_n = 0)) \right] \\
+&= \left[ Y_n(1) - Y_n(0) \right] \left[ \Pr(T_n = 1 \,|\, Z_n = 1) - \Pr(T_n = 1 \,|\, Z_n = 0) \right] \\
+&= \theta \left[ \Pr(T_n = 1 \,|\, Z_n = 1) - \Pr(T_n = 1 \,|\, Z_n = 0) \right].
+\end{aligned}
+$$
+We can solve for the average treatment effect by rearranging this equation:
+$$
+\theta = \frac{\mathbb{E} [Y_n \,|\, Z_n = 1] - \mathbb{E} [Y_n \,|\, Z_n = 0]}{\Pr(T_n = 1 \,|\, Z_n = 1) - \Pr(T_n = 1 \,|\, Z_n = 0)}.
+$$
+Because $Z_n$ is exogenous, we can consistently estimate the numerator using a difference of means.
+Let $\bar{Y}_{Z = 1}$ denote the sample mean of $Y_n$ among conscripted observations ($Z_n = 1$), and similarly let $\bar{Y}_{Z = 0}$ denote the sample mean among non-conscripted observations.
+Then we have
+$$
+\bar{Y}_{Z = 1} - \bar{Y}_{Z = 0} \approx \mathbb{E} [Y_n \,|\, Z_n = 1] - \mathbb{E} [Y_n \,|\, Z_n = 0]
+$$
+in sufficiently large samples.^[Formally, the weighted average on the left-hand side *converges in probability* to the population expectation on the right-hand side.]
+Similarly defining the subsample means $\bar{T}_{Z = 1}$ and $\bar{T}_{Z = 0}$,
+$$
+\bar{T}_{Z = 1} - \bar{T}_{Z = 0} \approx \Pr(T_n = 1 \,|\, Z_n = 1) - \Pr(T_n = 1 \,|\, Z_n = 0).
+$$
+in sufficiently large samples.
+The following *Wald estimator* is therefore a consistent estimator of the average treatment effect:
+$$
+\hat{\theta}_{\text{Wald}} = \frac{\bar{Y}_{Z = 1} - \bar{Y}_{Z = 0}}{\bar{T}_{Z = 1} - \bar{T}_{Z = 0}}.
+$$
+
+Here's how I think about the Wald estimator---and therefore about instrumental variables estimators more generally.
+We want to estimate the effect of $T$ on $Y$.
+For any pre-treatment variable $Z$, we may write
+$$
+\begin{aligned}
+\text{effect of $Z$ on $Y$}
+&= (\text{effect of $Z$ on $Y$ through $T$}) + (\text{effect of $Z$ on $Y$ not through $T$}) \\
+&= (\text{effect of $Z$ on $T$}) \times (\text{effect of $T$ on $Y$})
++ (\text{effect of $Z$ on $Y$ not through $T$}).
+\end{aligned}
+$$
+The exclusion restriction lets us cancel out the last term:
+$$
+\text{effect of $Z$ on $Y$}
+= (\text{effect of $Z$ on $T$}) \times (\text{effect of $T$ on $Y$}).
+$$
+The first stage assumption lets us divide:
+$$
+\text{effect of $T$ on $Y$}
+= \frac{\text{effect of $Z$ on $Y$}}{\text{effect of $Z$ on $T$}}
+$$
+And finally, the exogeneity assumption lets us estimate the numerator and denominator with a simple difference of means.
+The more complex technique of instrumental variables regression, which we'll work through below, builds on these same simple ideas.
+
+The above equation shows why it's important to have a *strong* instrument---one whose effect on treatment assignment is large in magnitude.
+If the instrument is weak, so that $\bar{T}_{Z = 1} - \bar{T}_{Z = 0}$ is a very small number in the typical sample, then there will be a lot of sample-to-sample variation in the Wald estimator, just as a mathematical consequence of dividing by a number close to zero.
+This means the standard errors of the Wald estimator will be high, making it difficult to draw precise inferences about treatment effects.
+
+
+## Two-Stage Least Squares
+
+The Wald estimator is useful when we have a binary instrument and treatment.
+But you may be asking:
+
+*   What if the instrument or treatment are non-binary?
+
+*   What if we observe some of the confounding factors and wish to control for them?
+
+*   What if we have more than one instrument?
+
+*Two-stage least squares* is a regression technique that can accommodate all of these situations.
+For each unit $n = 1, \ldots, N$, let $\mathbf{t}_n$ be a vector of $P \geq 1$ treatments whose marginal effects we wish to estimate.
+Let $\theta \in \mathbb{R}^P$ be the coefficients associated with each treatment.
+As usual, let $\mathbf{x}_n$ be a vector of $K \geq 0$ confounding variables we wish to control for, with associated coefficients $\beta \in \mathbb{R}^K$.
+We want to estimate the regression equation
+$$
+Y_n = \mathbf{t}_n \cdot \theta + \mathbf{x}_n \cdot \beta + \epsilon_n,
+$$
+where strict exogeneity holds for the confounders ($\mathbb{E} [\epsilon_n \,|\, \mathbf{x}_n] = 0$) but not the treatments ($\mathbb{E} [\epsilon_n \,|\, \mathbf{t}_n] \neq 0$).
+
+Assume we have a collection of $Q \geq P$ *instruments*, collected in the vector $\mathbf{z}_n$ for each unit $n$.
+As with the Wald estimator, we must make three assumptions about the instruments:
+
+1.  **Exogeneity.**
+    Each instrument must be uncorrelated with all unobserved confounders in the relationship between $\mathbf{t}_n$ and $Y_n$.
+
+2.  **First stage.**
+    Each instrument must affect treatment assignment.
+    
+3.  **Exclusion restriction.**
+    Each instrument may affect the outcome only through its effect on treatment assignment (and on any observed confounders).
+    
+The idea behind two-stage least squares is to find variation in the outcome that can be traced to variation in the instruments.
+The exclusion restriction implies that any such variation is operating through the treatments, so we can back out the effects of the treatments on the outcomes once we know the effects of the instruments on the treatments.
+Formally, the 2SLS estimator of $\theta$ is as follows:
+
+1.  For each treatment variable $p = 1, \ldots, P$, regress on the instruments and confounders:
+    $$
+    t_{np} = \mathbf{z}_n \cdot \gamma_p + \mathbf{x}_n \cdot \delta_p + \eta_{np}.
+    $$
+    Let $\hat{t}_{np}$ denote the predicted values from this regression, and collect the predicted values from all treatments in the vector $\hat{\mathbf{t}}_n$.
+    
+2.  Regress the outcome on the treatment values predicted in the first stage:
+    $$
+    Y_n = \hat{\mathbf{t}}_n \cdot \theta + \mathbf{x}_n \cdot \beta + \nu_n.
+    $$
+    The coefficients on $\hat{\mathbf{t}}_n$ in this regression will serve as our estimated treatment effects.
+    
+Under the assumption that the instruments are exogenous, this procedure essentially purges the "bad" (endogenous) parts of the treatments in the final regression.
+Strict exogeneity now holds, and our estimates will be unbiased.
+The exclusion restriction assumption ensures that $\hat{\theta}$ in the final regression can be interpreted as the effects of the treatments, rather than of the instruments themselves.
+The first stage assumption ensures that the second-stage regression will actually run.^[If $\mathbf{z}_n$ does not affect $\mathbf{t}_n$, then $\hat{\mathbf{t}}_n$ will be a linear combination of $\mathbf{x}_n$.  The design matrix in the second-stage regression will then be uninvertible.]
+
+These days you won't *literally* run two-stage least squares, in the sense of running `lm()` two times.
+If you were to do that, you would need to correct the standard errors that the second regression spits out, because they don't account for sampling variation in $\hat{\mathbf{t}}_n$.
+But it turns out that 2SLS is equivalent to a specific application of our old friend GLS.
+Let $\mathbf{W}$ be the $N \times (P + K)$ matrix containing the treatments and the exogenous covariates, so that $\mathbf{W} = [\mathbf{T} \: \mathbf{X}]$.
+Similarly, let $\mathbf{V}$ be the $N \times (Q + K)$ matrix of instruments and covariates, $\mathbf{V} = [\mathbf{Z} \: \mathbf{X}]$.
+It turns out that
+$$
+(\hat{\theta}_{\text{2SLS}}, \hat{\beta}_{\text{2SLS}}) = \left[ \mathbf{W}^\top \mathbf{V} (\mathbf{V}^\top \mathbf{V})^{-1} \mathbf{V}^\top \mathbf{W} \right]^{-1} \mathbf{W}^\top \mathbf{V} (\mathbf{V}^\top \mathbf{V})^{-1} \mathbf{V}^\top \mathbf{Y},
+$$
+which is the GLS regression of $\mathbf{Y}$ on $\mathbf{W}$ with weight matrix $\Omega = \left[\mathbf{V} (\mathbf{V}^\top \mathbf{V})^{-1} \mathbf{V}^\top \right]^{-1}$.
+
+If you're interested in the proof of this, see @greene [78].
+What's important for our purposes is that you'd want to use the corresponding GLS formula to obtain standard errors.
+Instrumental variables software like `ivreg()` in the **AER** package for R (or the `ivregress` command in Stata) will automatically do all this for you---you just need to specify the treatments, instruments, and exogenous covariates.
+
+### Instrument Selection
+
+Instrumental variables are usually scarce.
+You are more likely to worry about having too few instruments than having too many.
+But if you were to somehow find yourself with an abundance of instruments, how should you proceed?
+
+The core consideration is the *bias-variance tradeoff*.
+For a fixed sample size, each additional instrument makes 2SLS more biased, but reduces the standard errors.
+Why does an additional instrument increase the bias?
+The same reason that adding another variable to your model always increases its $R^2$.
+As the number of instruments approaches the sample size, $Q \to N$, the predicted values from the first-stage regression will approach the observed values, $\hat{T}_n \to T_n$.
+With enough instruments, then, 2SLS becomes identical to OLS.
+You may think this would not be a problem in sufficiently large samples, but you would be wrong [@bound1995problems].
+
+The problems are particularly acute with weak instruments.
+The addition of a weak instrument tends to increase the bias more than it decreases the variance.
+If you have a small number of strong instruments and a large number of weak instruments, you are almost certainly best off included the few strong instruments in 2SLS and leaving out all the weak instruments.
+
+The more common problem for a political scientist is that you have only one instrument available, and it is a weak one.
+In this case, you should probably present OLS estimates alongside 2SLS, and be upfront with your readers about the tradeoffs between the two.
+You will not get far with a causal claim staked entirely on a single 2SLS model with a weak instrument.
+
+For a model with a single endogenous treatment variable, the usual heuristic for instrument strength is that the regression of the treatment on the instrument(s) should have an $F$-statistic of at least 10 [@stock2002survey].
+
+### Equivalence to the Wald Estimator
+
+Everything we're going to do here depends on an important property of bivariate regression with a binary covariate.
+Let $X_n \in \{0, 1\}$ be a binary variable, and let $\bar{Y}_{X = 0}$ and $\bar{Y}_{X = 1}$ denote the sample mean of $Y_n$ among observations for which $X_n = 0$ and for which $X_n = 1$, respectively.
+Then if we use OLS to estimate the equation
+$$
+Y_n = \beta_0 + \beta_1 X_n + \epsilon_n,
+$$
+we will obtain the coefficients $\hat{\beta}_0 = \bar{Y}_{X = 0}$ and $\hat{\beta}_1 = \bar{Y}_{X = 1} - \bar{Y}_{X = 0}$.
+This in turn means the OLS predictions will equal the subsample means:
+$$
+\hat{Y}_n = \begin{cases}
+  \bar{Y}_{X = 0} & X_n = 0, \\
+  \bar{Y}_{X = 1} & X_n = 1.
+\end{cases}
+$$
+
+Now consider a single binary treatment $T_n$ and a single binary instrument $Z_n$.
+Our first-stage regression equation is
+$$
+T_n = Z_n \gamma + \eta_n.
+$$
+By the aforementioned property of OLS, this will produce the predicted values
+$$
+\begin{aligned}
+  \hat{T}_n
+  &= \begin{cases}
+    \bar{T}_{Z = 0} & Z_n = 0, \\
+    \bar{T}_{Z = 1} & Z_n = 1
+  \end{cases} \\
+  &= (1 - Z_n) \bar{T}_{Z = 0} + Z_n \bar{T}_{Z = 1}.
+\end{aligned}
+$$
+
+Now consider the 2SLS second-stage regression,
+$$
+Y_n = \alpha + \hat{T}_n \theta + \nu_n.
+$$
+To prove equivalence to the Wald estimator, we want to prove that
+$$
+\hat{\theta} = \frac{\bar{Y}_{Z = 1} - \bar{Y}_{Z = 0}}{\bar{T}_{Z = 1} - \bar{T}_{Z = 0}}.
+$$
+Substituting our expression for $\hat{T}_n$ into the regression equation here, we have
+$$
+\begin{aligned}
+Y_n &= \alpha + \left[ (1 - Z_n) \bar{T}_{Z = 0} + Z_n \bar{T}_{Z = 1} \right] \theta + \nu_n \\
+&= \underbrace{\alpha + \bar{T}_{Z = 0}}_{\equiv \kappa_0} + \underbrace{\left( \bar{T}_{Z = 1} - \bar{T}_{Z = 0} \right) \theta}_{\equiv \kappa_1} Z_n + \nu_n \\
+&= \kappa_0 + Z_n \kappa_1 + \nu_n.
+\end{aligned}
+$$
+Again by the properties of OLS on a binary covariate, we have $\hat{\kappa}_1 = \bar{Y}_{Z = 1} - \bar{Y}_{Z = 0}$.
+This in turn implies
+$$
+\hat{\theta} = \frac{\hat{\kappa}_1}{\bar{T}_{Z = 1} - \bar{T}_{Z = 0}}
+= \frac{\bar{Y}_{Z = 1} - \bar{Y}_{Z = 0}}{\bar{T}_{Z = 1} - \bar{T}_{Z = 0}}
+= \hat{\theta}_{\text{Wald}}.
+$$

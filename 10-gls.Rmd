@@ -1,0 +1,379 @@
+# Non-Spherical Errors {#nonspherical}
+
+In our consideration so far of the linear model,
+$$
+\mathbf{Y} = \mathbf{X} \beta + \epsilon,
+$$
+we have focused on the ordinary least squares estimator,
+$$
+\hat{\beta}_{\text{OLS}} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{Y}.
+$$
+We have seen that OLS is an unbiased and consistent estimator of the linear model parameters as long as we have strict exogeneity,
+$$
+E[\epsilon \,|\, \mathbf{X}] = \mathbf{0}.
+$$
+However, two more important properties of OLS depend on the assumption of spherical errors,
+$$
+V[\epsilon \,|\, \mathbf{X}] = \sigma^2 \mathbf{I} = \begin{bmatrix}
+  \sigma^2 & 0 & \cdots & 0 \\
+  0 & \sigma^2 & \cdots & 0 \\
+  \vdots & \vdots & \ddots & \vdots \\
+  0 & 0 & \cdots & \sigma^2
+\end{bmatrix}.
+$$
+These properties are
+
+1.  That $\hat{\beta}_{\text{OLS}}$ is efficient---no other unbiased estimator has smaller standard errors.
+
+2.  That the variance of OLS is given by the formula
+    $$
+    V[\hat{\beta}_{\text{OLS}} \,|\, \mathbf{X}] = \sigma^2 (\mathbf{X}^\top \mathbf{X})^{-1}.
+    $$
+
+In other words, if the spherical errors assumption fails to hold, there are two problems with OLS.
+
+1.  There is a better estimator available---one that is still unbiased, but is less sensitive to sampling variation (i.e., has lower standard errors).
+
+2.  The formula we use to estimate the standard errors of OLS is invalid.  Our confidence intervals and hypothesis tests will (usually) be overconfident, overstating the precision of our results.
+
+This week, we will talk about two ways to proceed in the face of non-spherical errors.  The first is to use an estimator other than OLS, specifically one called *generalized least squares*, or GLS.  GLS solves both of the problems listed above (inefficiency and invalid standard errors), but only under stringent conditions that are tough to confirm.
+
+The second is to use OLS, but to correct the standard errors.  Then our estimates will still be inefficient, relative to the hypothetical ideal GLS estimator, but we will at least be able to draw valid inferences (from large samples).
+
+Before we dive into these two methods, let's remind ourselves what deviations from the spherical errors assumption look like.  Spherical errors fails when we have either or both of:
+
+* Heteroskedasticity: $V[\epsilon_i] \neq V[\epsilon_j]$.
+
+* Autocorrelation: $\text{Cov}[\epsilon_i, \epsilon_j] \neq 0$ (for some $i \neq j$).
+
+Here's what each of the three cases looks like in bivariate data.
+
+```{r plot-spherical-errors, message=FALSE, echo = FALSE}
+library("tidyverse")
+
+set.seed(41)
+
+## Generate covariate
+n_obs <- 101
+x <- seq(0, 1, length.out = n_obs)
+
+## Generate errors
+e_spher <- rnorm(n_obs, sd = 1)
+e_het <- rnorm(n_obs, sd = 0.25 + 2 * x)
+e_auto <- numeric(n_obs)
+e_auto[1] <- rnorm(1, sd = 1)
+for (i in 2:n_obs) {
+    e_auto[i] <- 0.95 * e_auto[i - 1] + rnorm(1, sd = 1)
+}
+
+## Generate response
+alpha <- 1
+beta <- 5
+ey <- alpha + beta * x
+y_spher <- ey + e_spher
+y_het <- ey + e_het
+y_auto <- ey + e_auto
+
+data_error_types <- tibble(x, y_spher, y_het, y_auto) %>%
+    gather(key = y_type, value = y, starts_with("y")) %>%
+    mutate(y_type = factor(y_type,
+                           levels = c("y_spher", "y_het", "y_auto"),
+                           labels = c("Spherical errors", "Heteroskedasticity", "Autocorrelation")))
+
+ggplot(data_error_types, aes(x = x, y = y)) +
+    geom_point() +
+    geom_abline(intercept = alpha, slope = beta, colour = "blue") +
+    facet_wrap(~ y_type, ncol = 1)
+```
+
+Autocorrelation usually arises in clustered data (which we will cover very soon) or in time series analysis (which is beyond the scope of this course).
+For now, we'll focus on solving the problems that arise from heteroskedasticity.
+
+
+## Generalized Least Squares
+
+Suppose strict exogeneity holds, but spherical errors fails, with
+$$
+V[\epsilon \,|\, \mathbf{X}]
+= \sigma^2 \Omega
+= \sigma^2 \begin{bmatrix}
+  \omega_{11} & \omega_{12} & \cdots & \omega_{1N} \\
+  \omega_{12} & \omega_{22} & \cdots & \omega_{2N} \\
+  \vdots & \vdots & \ddots & \vdots \\
+  \omega_{1N} & \omega_{2N} & \cdots & \omega_{NN}
+\end{bmatrix},
+$$
+where $\Omega$ is known[^omega-matrix] and $\sigma^2$ is unknown.  In other words, we know the exact structure of heteroskedasticity and autocorrelation, up to a potentially unknown constant.
+
+[^omega-matrix]: Like any variance matrix, $\Omega$ must be symmetric and positive definite.  An $N \times N$ matrix $\mathbf{A}$ is positive definite if, for any $N \times 1$ vector $\mathbf{c} \neq \mathbf{0}$, the scalar $\mathbf{c}^\top \mathbf{A} \mathbf{c} > 0$.  Positive definiteness implies, among other things, that every diagonal entry of $\Omega$ is positive and that $\Omega$ is invertible.
+
+We derived the OLS estimator by finding the $\hat{\beta}$ that minimizes the sum of squared errors,
+$$
+\text{SSE}
+= \sum_n (Y_n - \mathbf{x}_n \cdot \hat{\beta})^2
+= (\mathbf{Y} - \mathbf{X} \hat{\beta})^\top (\mathbf{Y} - \mathbf{X} \hat{\beta}).
+$$
+We derive its close cousin, the *generalized least squares*, or GLS, estimator, by minimizing the *weighted* sum of squared errors,
+$$
+\text{WSSE} = (\mathbf{Y} - \mathbf{X} \hat{\beta})^\top \Omega^{-1} (\mathbf{Y} - \mathbf{X} \hat{\beta}).
+$$
+I'll spare you the matrix calculus that follows, but suffice to say the resulting estimator is
+$$
+\hat{\beta}_{\text{GLS}} = (\mathbf{X}^\top \Omega^{-1} \mathbf{X})^{-1} \mathbf{X}^\top \Omega^{-1} \mathbf{Y}.
+$$
+If you plug $\Omega = \mathbf{I}_N$ into this formula, you'll end up with the OLS estimator.
+Hence the name *generalized* least squares: OLS is a special case of GLS.
+
+Similar to the formula for OLS, the variance of GLS is
+$$
+V[\hat{\beta}_{\text{GLS}} \,|\, \mathbf{X}] = \sigma^2 (\mathbf{X}^\top \Omega^{-1} \mathbf{X})^{-1}.
+$$
+
+Like OLS, GLS is unbiased and consistent as long as we have strict exogeneity.  Even if we get $\Omega$ wrong---i.e., we misspecify the structure of the error variance---GLS will still "work" in the sense of giving us an unbiased and consistent estimate of the coefficients.
+To confirm this, we can once again take the expected value of the estimator:
+$$
+\begin{aligned}
+E [ \hat{\beta}_{\text{GLS}} \,|\, \mathbf{X} ]
+&= E [ (\mathbf{X}^\top \Omega^{-1} \mathbf{X})^{-1} \mathbf{X}^\top \Omega^{-1} \mathbf{Y} \,|\, \mathbf{X} ] \\
+&= (\mathbf{X}^\top \Omega^{-1} \mathbf{X})^{-1} \mathbf{X}^\top \Omega^{-1} E [\mathbf{Y} \,|\, \mathbf{X} ] \\
+&= (\mathbf{X}^\top \Omega^{-1} \mathbf{X})^{-1} \mathbf{X}^\top \Omega^{-1} (\mathbf{X} \beta) \\
+&= (\mathbf{X}^\top \Omega^{-1} \mathbf{X})^{-1} (\mathbf{X}^\top \Omega^{-1} \mathbf{X}) \beta \\
+&= \beta.
+\end{aligned}
+$$
+If we get $\Omega$ right, then GLS has two important additional properties.
+
+1.  Our estimate of the variance matrix,
+    $$
+    \hat{\Sigma} = \frac{\text{WSSE}}{N - K} (\mathbf{X}^\top \Omega^{-1} \mathbf{X})^{-1},
+    $$
+    is valid for inference using the same methods we discussed in the OLS case.
+
+2.  GLS is efficient, per the Gauss-Markov theorem: there is no other unbiased estimator with lower standard errors.
+
+The first of these is pretty important; the second is just icing on the cake.  The main problem with non-spherical errors is the threat they pose to inference from OLS.  GLS fixes that---as long as we know $\Omega$.  More on this soon.
+
+An important special case of GLS is when there is heteroskedasticity but no autocorrelation, so that
+$$
+\Omega = \sigma^2 \begin{bmatrix}
+  \omega_{1} & 0 & \cdots & 0 \\
+  0 & \omega_{2} & \cdots & 0 \\
+  \vdots & \vdots & \ddots & \vdots \\
+  0 & 0 & \cdots & \omega_{N}
+\end{bmatrix}.
+$$
+In this special case, which is called *weighted least squares*, the weighted sum of squared errors is a simple weighted average:
+$$
+\text{WSSE} = \sum_n \frac{(Y_n - \mathbf{x}_n \cdot \hat{\beta})^2}{\omega_n}.
+$$
+Notice that the observations with the lowest residual variance (smallest $\omega_n$) contribute the most to the regression estimate.
+The penalty on the size of the residual is largest for these observations, so GLS will try hard to find a regression line close to them, even at the expense of larger errors for the observations with greater residual variance.
+A fun fact (that admittedly is not so useful with modern computing tools available) is that GLS in this case gives us the same answer as if we ran OLS on the following "weighted" data:
+$$
+\mathbf{X}^* = \begin{bmatrix}
+  x_{11} / \sqrt{\omega_{1}} & x_{12} / \sqrt{\omega_{1}} & \cdots & x_{1K} / \sqrt{\omega_{1}} \\
+  x_{21} / \sqrt{\omega_{2}} & x_{22} / \sqrt{\omega_{2}} & \cdots & x_{2K} / \sqrt{\omega_{2}} \\
+  \vdots & \vdots & \ddots & \vdots \\
+  x_{N1} / \sqrt{\omega_{N}} & x_{N2} / \sqrt{\omega_{N}} & \cdots & x_{NK} / \sqrt{\omega_{N}}
+\end{bmatrix},
+\mathbf{Y}^* = \begin{bmatrix}
+  Y_1 / \sqrt{\omega_{1}} \\
+  Y_2 / \sqrt{\omega_{2}} \\
+  \vdots \\
+  Y_N / \sqrt{\omega_{N}}
+\end{bmatrix}.
+$$
+
+
+## Detecting Heteroskedasticity
+
+If you don't have prior knowledge of the variance structure of the error term, you may be interested in testing whether the homoskedasticity assumption of OLS is viable.  In a bivariate regression model, you can usually detect heteroskedasticity via the eye test.  Not so much when you have multiple covariates.  In this case, you may want to formally test for heteroskedasticity.
+
+There are a few such tests, but we will just talk about the *Breusch-Pagan test*, which was developed by @breusch1980lagrange and refined by @koenker1982robust.  The null hypothesis of the test is that $V[\epsilon_i \,|\, \mathbf{X}] = \sigma^2$ for all $i = 1, \ldots, N$.  The test procedure is as follows.
+
+1. Calculate the OLS estimate, $\hat{\beta}_{\text{OLS}}$.
+2. Calculate the OLS residuals, $\hat{e} = Y - \mathbf{X} \hat{\beta}_{\text{OLS}}$.  Let $\hat{u}$ be the vector of squared residuals, $\hat{u} = (\hat{e}_1^2, \ldots, \hat{e}_N^2)$.
+3. Run a regression of $\hat{u}$ on $\mathbf{Z}$, an $N \times q$ matrix of covariates.  Let $R_{\hat{u}}^2$ denote the $R^2$ of this regression.
+4. Reject the null hypothesis if $N R_{\hat{u}}^2$ exceeds the critical value for a $\chi_{q - 1}^2$ distribution.
+
+In the canonical version of this test, $\mathbf{Z}$ is equal to $\mathbf{X}$.  A more powerful version is the *White test* [@white1980heteroskedasticity], in which $\mathbf{Z}$ contains each variable in $\mathbf{X}$ as well as all second-order terms (squares and interactions).
+
+## Heteroskedasticity of Unknown Form
+
+Suppose we know there is heteroskedasticity but we don't trust ourselves to properly specify the error variances to run weighted least squares.[^fgls]  Then we do not have an efficient estimator of $\beta$.  We might be all right with that, but we would really like to have a good estimator for the standard errors of the OLS estimator, so that we can test hypotheses about the coefficients.  Happily, we can estimate the variance matrix of the OLS estimator consistently even in the presence of heteroskedasticity.
+
+[^fgls]: There is an in-between solution known as *feasible generalized least squares*, whereby we estimate $\Omega$ from the data.  This requires placing some structure on $\Omega$, and the resulting estimator will be consistent but not unbiased.
+
+*White's heteroskedasticity-consistent estimator* [@white1980heteroskedasticity] of the variance matrix starts by forming a diagonal matrix out of the squared residuals,
+$$
+\hat{\mathbf{U}}
+=
+\begin{bmatrix}
+\hat{u}_1 & 0 & \cdots & 0 \\
+0 & \hat{u}_2 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & \hat{u}_N
+\end{bmatrix}
+=
+\begin{bmatrix}
+\hat{e}_1^2 & 0 & \cdots & 0 \\
+0 & \hat{e}_2^2 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & \hat{e}_N^2
+\end{bmatrix}
+$$
+This lets us form the "meat" of the "sandwich" that is White's estimator of the OLS variance matrix:
+$$
+\hat{\Sigma}_{\text{HC}}
+=
+(\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \hat{\mathbf{U}} \mathbf{X} (\mathbf{X}^\top \mathbf{X})^{-1}.
+$$
+You know I love proofs, but I am not even going to attempt to prove that this consistently estimates the (asymptotic) variance matrix of $\hat{\beta}_{\text{OLS}}$.  See @greene [pp. 198--199] for a sketch of the proof.
+
+White's estimator is consistent but not unbiased, so we may want to apply a sort of bias correction in small samples.  A popular choice is the so-called "HC1" estimator, which corrects for the number of parameters estimated the same way the usual OLS variance estimator does:
+$$
+\hat{\Sigma}_{\text{HC1}} = \frac{N}{N - K} \hat{\Sigma}_{\text{HC}}
+$$
+In this scheme, the original White estimator is called the "HC0" estimator.
+
+HC1 is the default estimator used by Stata when you run a regression with the `, robust` option.
+If for some reason you ever need an exact replication of a regression someone did with "robust standard errors", you'll most likely want to use the HC1 option.
+However, HC1 is not actually the best correction for small samples.
+@long2000using run simulations and find that the HC3 estimate provides a better estimate in small samples.[^colada]
+HC3 works with a slightly different $\hat{\mathbf{U}}$ matrix than HC0 or HC1: a diagonal matrix where each $n$'th diagonal entry is
+$$
+\frac{\hat{e}_n^2}{(1 - \mathbf{x}_n^\top (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{x}_n)^2}.
+$$
+Once again, I am not going to try to explain why this works.
+Suffice to say, econometricians much smarter than me think it is the best small-sample correction, and luckily it is the default in the R package we will use.
+
+[^colada]: [This blog post by Uri Simonsohn](http://datacolada.org/99) drew my attention to the use of HC1 as the Stata default and the superiority of HC3 in small samples.
+
+Weighted least squares and heteroskedasticity-consistent standard errors are not mutually exclusive approaches.  If you have a suspicion about the error variances that you think can improve the precision of the regression, but you are not totally comfortable with committing to WLS for inference, you can calculate heteroskedasticity-consistent standard errors for a WLS (or GLS) fit.
+
+
+## Appendix: Implementation in R
+
+We'll be using the following packages:
+
+```{r gls-pkgs, message=FALSE}
+library("tidyverse")
+library("broom")
+library("car")
+library("lmtest")
+library("sandwich")
+```
+
+We will use data from the **car** package on professors' salaries.  This is a topic that, ideally, will be of great concern to you in 5ish years.
+
+```{r salaries}
+data(Salaries)
+head(Salaries)
+```
+
+### Generalized Least Squares
+
+Let us model a professor's salary as a function of the number of years since she received her PhD.  If we glance at the data, we see obvious heteroskedasticity.
+
+```{r salaries-plot-hetero}
+ggplot(Salaries, aes(x = yrs.since.phd, y = salary)) +
+    geom_point()
+```
+
+There is much more variation in the salaries of professors 30+ years into their careers than in those who are fresh out of grad school.  If we want the most precise model of the relationship between years since PhD and salary, we might want to place more weight on early-career professors and less on late-career professors.
+
+Remember that weighted least squares is the special case of GLS where the off-diagonal elements of $\Omega$ are zero (i.e., there is heteroskedasticity but no autocorrelation):
+$$
+\Omega = \sigma^2 \begin{bmatrix}
+  \omega_{11} & 0 & \cdots & 0 \\
+  0 & \omega_{22} & \cdots & 0 \\
+  \vdots & \vdots & \ddots & \vdots \\
+  0 & 0 & \cdots & \omega_{NN}
+\end{bmatrix}.
+$$
+To run weighted least squares in R, we just use the `weights` argument to the `lm()` function.  As an example, let's set
+$$
+\omega_{nn} = \frac{1}{\text{Years Since PhD}_n}
+$$
+for each observation $n$, to place the greatest weight on early-career observations.  We will first run a baseline OLS model, then compare to the weighted model.
+
+```{r salary-models}
+ols_salaries <- lm(salary ~ yrs.since.phd + yrs.service,
+                   data = Salaries)
+summary(ols_salaries)
+
+wls_salaries <- lm(salary ~ yrs.since.phd + yrs.service,
+                   weights = 1 / yrs.since.phd,
+                   data = Salaries)
+summary(wls_salaries)
+```
+
+Compared to OLS, our WLS model yields a stronger relationship between years since the PhD and the expected value of a professor's salary.  In addition, we estimate a smaller coefficient on years of service, and would no longer reject the null hypothesis of no relationship there.
+
+Which model is better, OLS or WLS?  It depends on whether our weights correspond to the true relative variance in the error term.  In this case, we've specified a pretty aggressive weighting scheme---a professor with 1 year of service gets double the weight of a professor with 2 years of service.  An alternative weighting scheme would give us different results.  The "best" model is the one that best corresponds to the true $\Omega$, which unfortunately is hard to know in advance.  The best we can do is apply theory and judgment in a thoughtful way.
+
+In the (relatively unlikely) event that you are pre-specifying $\Omega$ with autocorrelations, you can use the `lm.gls()` function from the **MASS** package.  The `gls()` function from the **nlme** package performs *feasible* generalized least squares, whereby we write $\Omega$ as a function of a few parameters, estimate those parameters, and run the subsequent GLS model.
+
+
+### Breusch-Pagan Test
+
+We already used the "eye test" to confirm the presence of heteroskedasticity in the relationship we are modeling, but let's see how we would use the Breusch-Pagan test to confirm our suspicion.  For this we use the `bptest()` function from the **lmtest** package.
+
+```{r bp-test, message=FALSE}
+bptest(ols_salaries)
+```
+
+By default, `bptest()` uses the same variables as in the original regression in the regression of the squared residuals.  To perform the White test, we can use an extra argument to `bptest()` to specify a different model formula.
+
+```{r white-test}
+bptest(ols_salaries,
+       ~ yrs.since.phd * yrs.service + I(yrs.since.phd^2) + I(yrs.service^2),
+       data = Salaries)
+```
+
+In this case, regardless of which test we use, we reject the null hypothesis of homoskedasticity.
+
+
+### Heteroskedasticity-Consistent Standard Errors
+
+To calculate the White estimator and its friends in R, we use the `vcovHC()` function from the **sandwich** package.
+The default here is the HC3 estimate.
+
+```{r hccm}
+vcv_hc3 <- vcovHC(ols_salaries)
+vcv_hc3
+```
+
+To use HC1 (or another one of the finite-sample corrections to the ordinary White estimate), change the `type` argument to, e.g., `type = "HC1"`.  See `?vcovHC` for all the options.
+
+To create a "regression table" using our new "robust" standard errors, we can use the `coeftest()` function from the **lmtest** package.
+
+```{r hccm-coeftest}
+coeftest(ols_salaries)  # Original table
+coeftest(ols_salaries, vcov = vcv_hc3)  # With corrected SEs
+```
+
+Just like ordinary regression tables, the ones made by `coeftest()` can be "swept" into data frames using the tools in **broom**:
+
+```{r hccm-broom}
+tidy(coeftest(ols_salaries, vcov = vcv_hc3))
+```
+
+You may also want to use the White-estimated standard errors to conduct Wald tests of linear hypotheses.  You can do that by supplying the relevant estimated variance matrix to the `vcov` argument of `linearHypothesis()`:
+
+```{r hccm-linearHypothesis}
+linearHypothesis(ols_salaries,
+                 c("yrs.since.phd = 1500", "yrs.service = -500"),
+                 vcov = vcv_hc3,
+                 test = "Chisq")
+```
+
+Finally, remember how earlier we talked about how the WLS estimates are only as good as the weights you choose.  If they're not the true weights, then WLS is not efficient and the standard error estimator is inconsistent.  We can't fix the first problem, but we can fix the second.  To wit, you can estimate heteroskedasticity-consistent standard errors for WLS models too.
+
+```{r hccm-wls}
+vcv_hc3_wls <- vcovHC(wls_salaries)
+coeftest(wls_salaries)  # Original
+coeftest(wls_salaries, vcov = vcv_hc3_wls)  # Corrected
+```
+
+So if you have a good idea about the residual variances but aren't sure you've nailed it down, you can have the best of both worlds---at least in terms of large-sample hypothesis testing.

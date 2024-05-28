@@ -1,0 +1,409 @@
+# Causal Modeling {#causal}
+
+We have skirted around questions of cause and effect for long enough.
+It is time to talk about how we use linear models to draw causal inferences.
+
+## The Potential Outcomes Model
+
+I find it easiest to think about causality through the lens of the *potential outcomes* model popularized by Donald Rubin [see @rubin2005causal].
+Rubin thinks of causal effects in terms of differences between counterfactual outcomes, only one of which we actually observe.
+The *treatment effect for a unit* answers the question: How different is the outcome if this unit receives the treatment rather than the control?
+This is inherently a counterfactual question, because in practice we cannot observe the same unit under both conditions.
+The *average treatment effect*, which is usually what we are interested, is the average of unit-level treatment effects across some population of units.
+
+It is essentially hopeless to draw inferences about unit-level treatments, even under the best of circumstances.
+A randomized, double-blinded, well-run experiment won't tell us if taking an Advil would have taken away my headache on a particular afternoon.
+But if we have a good research design, statistics can help us draw inferences about average treatment effects.
+We can, in principle, consistently estimate the average reduction in headache duration due to taking an Advil.
+
+Consider $n = 1, \ldots, N$ units from some population.
+Let $T_n$ denote the *treatment* whose effects we want to estimate.
+To keep things simple here, we will work with binary treatments, $T_n \in \{0, 1\}$.
+You may (but don't have to) think of $T_n = 1$ as "treated" and $T_n = 0$ as "control".
+Conceptually, everything we're going to do would carry over to continuous or categorical treatments, but the notation gets a lot more cumbersome.
+
+We want to estimate the effect of the treatment on a particular *outcome*.
+Let $Y_n$ denote the outcome---which we will assume is a numerical quantity---for the given observation.
+We will assume that the outcome depends on the treatment that the unit receives.
+There are two *potential outcomes*, one for each treatment.
+Let $Y_n(1)$ denote the outcome in case $T_n = 1$, and let $Y_n(0)$ denote the outcome in case $T_n = 0$.^[We are implicitly imposing the *stable unit treatment values*, or SUTVA, condition here by assuming that the outcome for one unit does not depend on what treatment other units receive.  SUTVA violations may arise in political science applications, but how to deal with them is a topic beyond the scope of this course.]
+The *treatment effect* for a given unit is the difference between these potential outcomes.
+
+To illustrate the potential outcomes model, suppose:
+
+*   The units $n = 1, \ldots, N$ are adults living in Nashville.
+*   The treatment $T_n \in \{0, 1\}$ indicates whether the person was mailed (1) or was not mailed (0) a get-out-the-vote flyer.
+*   The outcome $Y_n \in \{0, 1\}$ indicates whether the person votes (1) or does not vote (0) in the 2020 election.
+
+The potential outcomes for a hypothetical set of adults might look something like the following.
+
+ $n$    $Y_n(1)$    $Y_n(0)$    Treatment effect
+----   ---------   ---------   -----------------
+   1           1           1                   0
+   2           0           0                   0
+   3           1           0                   1
+   4           0           1                 --1
+   
+Person 1 would have voted no matter what and thus has zero treatment effect.
+Person 2 also has zero treatment effect, but because they would *not* have voted no matter what.
+There is a positive treatment effect for Person 3, who would vote if and only if they were sent the flyer.
+Person 4 is the opposite---they would vote if and only if they *didn't* get the flyer---and thus has a negative treatment effect.
+Overall, the average treatment effect is zero:
+$$
+\frac{1}{N} \sum_{n=1}^N \left[ Y_n(1) - Y_n(0) \right]
+= \frac{1}{4} \left[ 0 + 0 + 1 - 1 \right]
+= 0.
+$$
+
+We haven't said anything yet about what treatment anyone actually receives.
+The treatment effect for a unit has nothing to do with which treatment it receives.
+It is merely a comparison of potential outcomes.
+
+The *fundamental problem of causal inference* is that we can only observe one of the potential outcomes for each unit [@holland1986statistics].
+If a person is sent the flyer, we cannot observe what would have happened had they not been sent the flyer.
+What we actually observe will instead look like this:
+
+ $n$    $T_n$    $Y_n(1)$    $Y_n(0)$    Treatment effect
+----   ------   ---------   ---------   -----------------
+   1        0       **?**           1               **?**
+   2        1           0       **?**               **?**
+   3        1           1       **?**               **?**
+   4        0       **?**           1               **?**
+   
+Our goal is to estimate average treatment effects despite the fundamental problem of causal inference.
+It is difficult to do this well.
+For example, we saw in the first table above that the true average treatment effect in our population is zero.
+Yet if we look at the available data---the potential outcomes that were actually realized, given the treatment each unit received---we get a distinct picture.
+Half of those who received the treatment voted, which all of those who did not receive the treatment voted.
+A naive analyst might look at that and conclude that the treatment reduces one's likelihood of voting by 50%.
+How can we draw valid inferences from data that is always incomplete?
+
+The best-case scenario is for treatment assignment to be independent of potential outcomes.
+One way to formalize this condition is
+$$
+\Pr(T_n = 1 \,|\, Y_n(0) = y_0, Y_n(1) = y_1) = \Pr(T_n = 1) \qquad \text{for all $y_0$ and $y_1$.}
+$$
+Randomized experiments always satisfy the condition, provided that the randomization wasn't fudged in any way.
+If treatment assignment is independent of potential outcomes, then the simple difference of means is an unbiased estimator of the average treatment effect.
+As always, this doesn't mean the estimate from any given sample will be correct---there is sampling variation.
+But if you could repeat the procedure across many samples, the average of your results will be on target.
+
+In observational studies, however, it is extremely unlikely that treatment assignment will be independent of potential outcomes.
+There are a few reasons why this might be the case, but the biggest issue for our purposes is *confounding variables*.
+A confounding variable is one that has a causal effect on treatment assignment and on one or more of the potential outcomes.
+
+To see why confounding variables break the independence of treatment assignment and the potential outcomes, imagine an observational study of the effects of the Covid vaccine on one's likelihood of catching the disease.
+The two potential outcomes here are:
+
+*   $Y_n(0)$: will you catch the disease if you don't get the vaccine?
+
+*   $Y_n(1)$: will you catch the disease if you do get the vaccine?
+
+People who are especially likely to catch the disease in the absence of the vaccine, such as nurses and other essential workers, may be especially likely to get vaccinated.
+On the other hand, those who think they're unlikely to catch Covid---those who have already been infected, or who work from home---may not be as eager to get vaccinated.
+Consequently, "treated" observations ($T_n = 1$) are likely to be disproportionately concentrated among those who are relatively likely to catch Covid in the absence of the vaccine ($Y_n(1) = 1$).
+This means a naive difference of means will be a biased representation of the true causal effect of the vaccine.
+
+### What can be a treatment?
+
+The potential outcomes model is founded on the idea that any unit could, in principle, receive different values of the treatment.
+@holland1986statistics observes that this limits which variables may be considered treatments in a statistical analysis.
+He summarizes his view with the slogan *No causation without manipulation*.
+If it's not plausible that you could exogenously manipulate the value of $T_n$, then it's not a treatment.
+Policy interventions are good candidates to be considered treatments: you could plausibly induce me to go to some job training (or to refrain from going).
+Immutable attributes or characteristics, on the other hand, are not treatments in this sense.
+I was born in Cincinnati, and there's nothing you could plausibly do to change this, so Holland would say it's nonsensical to ask what is the effect of my having been born in Cincinnati on some outcome.
+
+You may be wondering what this means for studies of race, gender, ethnicity, LGBTQ+ identity, and so on.
+Political scientists and the public at large have a lot of questions about how these characteristics affect political behavior and political outcomes, yet now we're hearing that these are "immutable characteristics" for which it is incoherent to talk about, let alone estimate, causal effects.
+The key is to think carefully about what your units are and what causal question you're asking.
+For example, you might be interested in how court decisions are affected by the judge's racial identity.
+If you think about your unit as the judge, then you may think this is hopeless in the Holland framework, since any given judge's racial identity is not something that is plausibly manipulable.
+But you might instead think of the *case* as your unit of analysis, and (for example) "Heard by a White judge" and "Heard by a Black judge" as your treatments.
+Whereas it would not be plausible to manipulate the racial identity of a given judge, it is obviously plausible to manipulate which judge receives a case.
+See @sen2016race for much more on how to apply the causal inference framework to questions about immutable characteristics.
+
+
+## Regression and Potential Outcomes
+
+We can think of the linear model as a special case of the very general potential outcomes framework.
+We lose some generality by positing a particular linear relationship between the confounding variables and the outcome of interest.
+What we gain is a clear path to estimating treatment effects---namely by OLS (and similar regression estimators).
+
+For each unit $n$, let $\mathbf{x}_n$ be a vector of $K$ confounding variables.
+Still working with a binary treatment, $T_n \in \{0, 1\}$, we model the potential outcomes as
+$$
+\begin{aligned}
+  Y_n(0) &= \mathbf{x}_n \cdot \beta + \eta_n, \\
+  Y_n(1) &= \theta + \mathbf{x}_n \cdot \beta + \nu_n.
+\end{aligned}
+$$
+In these equations:
+
+*   $\beta$ is a $K \times 1$ vector of regression coefficients, including the intercept.
+*   $\theta$ represents the average treatment effect, as we'll see momentarily.
+*   $\eta_n$ and $\nu_n$ are error terms satisfying strict exogeneity: we'll assume $\mathbb{E} [\eta_n \,|\, \mathbf{x}_n, T_n] = \mathbb{E} [\nu_n \,|\, \mathbf{x}_n, T_n] = 0$ for all $n$.
+
+The inclusion of the treatment indicator, $T_n$, in the strict exogeneity assumptions is critical here.
+We are assuming that any unobserved influences on either potential outcome are uncorrelated with treatment assignment.
+This means there are no unobserved confounding variables!
+In actual observational research, the plausibility of this assumption ranges from "mildly suspect" to "incredibly unrealistic".
+
+Returning to the model, the unit-level treatment effect is
+$$
+Y_n(1) - Y_n(0) = \theta + \nu_n - \eta_n.
+$$
+Because $\mathbb{E} [\nu_n] = \mathbb{E} [\eta_n] = 0$, this implies the average treatment effect in the population is $\mathbb{E} [Y_n(1) - Y_n(0)] = \theta$.
+If our mildly-suspect-to-incredibly-unrealistic assumption on the unobserved errors holds, then we can consistently estimate the average treatment effect via OLS.
+We need to estimate the regression equation
+$$
+\mathbf{Y} = \mathbf{T} \theta + \mathbf{X} \beta + \epsilon,
+$$
+where $\mathbf{T}$ is an $N \times 1$ vector of treatment assignment indicators.[^exogeneity]
+
+[^exogeneity]: Each $\epsilon_n = (1 - T_n) \eta_n + T_n \nu_n$.  Our assumptions on $\eta_n$ and $\nu_n$ imply that strict exogeneity is satisfied:
+    $$
+    \begin{aligned}
+    \mathbb{E} [\epsilon_n \,|\, \mathbf{x}_n, T_n]
+    &= \mathbb{E} [(1 - T_n) \eta_n + T_n \nu_n \,|\, \mathbf{x}_n, T_n] \\
+    &= (1 - T_n) \mathbb{E} [\eta_n \,|\, \mathbf{x}_n, T_n] + T_n \mathbb{E} [\nu_n \,|\, \mathbf{x}_n, T_n] \\
+    &= 0.
+    \end{aligned}
+    $$
+
+In the early 2010s, there was a fad of "matching" estimators that purported to fix all kinds of problems with regression for causal modeling.
+I have no idea if people are still using these because I stopped paying attention to the matching literature, but if nothing else, a nonzero proportion of your reviewer pool will have gotten their training in the heyday of matching.
+In truth, the main advantage of matching is that it allows for nonlinear relationships between confounding variables, treatment assignment, and potential outcomes.
+The main disadvantages, as with any estimator that allows for a more flexible relationship, are that it's harder to implement and has greater standard errors.
+But matching shares the same basic flaw as regression --- it's biased and inconsistent if there are any unmeasured confounding variables.
+So the main use case for matching (and similar alternatives to regression) is that (1) you don't think unmeasured confounding is a serious problem, (2) you suspect there are major nonlinearities in the underlying relationships, and (3) you have enough data to deal with the greater variability associated with the more flexible estimator.
+
+
+## Specification Issues
+
+If you want to give your regression a causal interpretation, which variables should you include in your model?
+Let's classify candidates for inclusion based on their potential to affect the treatment $T$ and the outcome $Y$.
+
+ $X$ affects $T$?    $X$ affects $Y$?    Recommendation
+------------------  ------------------   ---------------
+No                  No                   Do not include
+Yes                 No                   Do not include, but may be useful as an instrument!
+No                  Yes                  Include only if $T$ cannot affect $X$
+Yes                 Yes                  Must include
+
+Two of these cases are easy to dispense with.
+A variable that can't plausibly affect the treatment or the outcome is irrelevant and has no place in the regression model---it's just using up degrees of freedom and inflating your standard errors for no reason.
+At the other extreme, a variable that affects both treatment assignment and the outcome is a classic confounder and must be controlled for if you want to draw valid causal inferences.
+
+People get more confused about the in-between cases.
+Imagine a variable that affects treatment assignment but not the outcome.
+For example, suppose our units are students, our treatment $T$ is attending a football game on the Saturday before the election, and our outcome $Y$ is voting in the November election.
+Suppose some students were randomly selected to receive free tickets to the game, and let $X$ be an indicator for the students in this group.
+Clearly $X$ is likely to affect game attendance, but it seems unlikely to have a direct effect on voting (though perhaps it could affect voting indirectly via its effect on the treatment).
+Should we control for $X$ in our regression model?
+There's no real statistical gain from doing so.
+It's not a confounding variable, so we don't need to include it for the sake of strict exogeneity; and it doesn't explain any residual variation in the outcome, so it won't improve our model fit in any way.
+
+However, as we will see in the next unit, variables that affect treatment assignment while having no effect on the outcome can come in handy for causal inference.
+Under certain conditions, they can serve as *instrumental variables* that help us get around strict exogeneity violations in our estimation of treatment effects.
+So if you have a variable like this, hang onto it!
+
+The last type of variable to consider is one that affects the outcome but not the treatment.
+In general, it is best to include these variables in your model as long as they are "pre-treatment"---i.e., they cannot plausibly be affected by the treatment assignment.
+As long as you're controlling for all confounders, your regression model will be unbiased and consistent even if you don't control for these kinds of variables.
+However, if some of these outside factors have a large influence on the outcome, then you can estimate the treatment effect more precisely when you include them in the regression model.
+We can see this in practice with an example of a randomized experiment, where $T$ is assigned totally randomly (so even a difference of means is unbiased) but numerous other factors affect the outcome.
+
+```{r include-pretreatment}
+set.seed(202)
+n <- 1000
+
+## Simulate covariates that affect outcome
+x1 <- rnorm(n)
+x2 <- rnorm(n)
+x3 <- rnorm(n)
+
+## Simulate potential outcomes
+theta <- 0.5
+xb <- 1 + x1 - x2 + x3
+y0 <- xb + rnorm(n)
+y1 <- theta + xb + rnorm(n)
+
+## Random treatment assignment
+t <- sample(0:1, size = n, replace = TRUE)
+y <- ifelse(t == 1, y1, y0)
+
+## Regression without covariates
+summary(lm(y ~ t))
+
+## Regression with covariates
+summary(lm(y ~ t + x1 + x2 + x3))
+```
+
+Both estimators are unbiased, but the second one yields a result closer to the truth and has a substantially lower standard error.
+Controlling for other major influences on $Y$ helps us isolate the effect of $T$.
+
+### Post-Treatment Variables
+
+In your regression models, you should not include covariates that can be affected by the treatment.
+Doing so will introduce needless bias to your estimates of treatment effects.
+If anyone, including a referee, tells you to control for post-treatment variables in your analyses, you should politely decline to do so.
+You can cite @rosenbaum1984consequences as the authority on this.
+
+Why is it wrong to control for post-treatment variables?
+I always think of an example from medicine.
+Suppose your unit of analysis is individuals, the treatment is whether the individual is a smoker, and the outcome is a lung cancer diagnosis.
+Tar in the lungs is itself a risk factor for lung cancer, so you may be tempted to control for some measure of tar presence in your regression.
+The problem is that smoking has a rather large effect on tar presence.
+Our causal question is "If an average non-smoker took up smoking, how much more or less likely would they be to develop lung cancer?"
+But if you regress the cancer indicator on smoking and lung tar, the coefficient on smoking won't answer this question.
+It would instead answer the much less compelling question "If an average non-smoker took up smoking, *and the amount of tar in their lungs nonetheless stayed the same*, how much more or less likely would they be to develop lung cancer?"
+
+I'll again do a little simulation to illustrate post-treatment bias.
+Imagine a binary treatment $T$ that has a direct effect of $+1$ on the outcome $Y$.
+In addition, $T$ raises an auxiliary variable $X$ by $+0.25$, and each unit increase in $X$ increases the outcome by $+2$.
+So the total treatment effect of $T$ is $+1.5$.
+We'll see that controlling for $X$ in our regressions *introduces* bias that wouldn't be present otherwise.
+
+```{r post-treatment-bias}
+set.seed(200)
+n <- 2500
+
+## Simulate randomized treatment assignment
+t <- sample(0:1, size = n, replace = TRUE)
+
+## Simulate effect of T on X
+x0 <- rnorm(n)
+x1 <- rnorm(n) + 0.25
+
+## Simulate effect of T and X on potential outcomes
+y0 <- rnorm(n) + 2 * x0
+y1 <- rnorm(n) + 1 + 2 * x1
+
+## Confirm that the true ATE equals roughly 1.5
+mean(y1 - y0)
+
+## Generate observed values
+x <- ifelse(t == 1, x1, x0)
+y <- ifelse(t == 1, y1, y0)
+
+## Regression not controlling for post-treatment variable
+summary(lm(y ~ t))
+
+## Regression controlling for post-treatment variable
+summary(lm(y ~ t + x))
+```
+
+The first regression, excluding the post-treatment variable $X$, is spot-on.
+The second regression, which includes the post-treatment variable, yields a biased estimate of the treatment effect.
+
+Having seen examples like this one, sometimes people will say it's ok to control for post-treatment variables because doing so can only bias against finding something.
+This is wrongheaded because your job should be to come up with accurate estimates of treatment effects, not to prove a point.
+And even on its own terms it's not true.
+Cyrus Samii has an [excellent blog post](https://cyrussamii.com/?p=730) explaining why.
+
+Sometimes you will be more interested in the question "What channels does the causal effect operate through?" rather than "What is the causal effect?"
+Then you will need to consider post-treatment variables, using something like a causal mediation analysis [@imai2010general].
+That is a topic beyond the scope of this course.
+Don't go sticking post-treatment variables into your regressions due to a vague desire to say something about mechanisms---make sure you're asking a clear question and choosing a statistical tool appropriate for the job.
+
+### Control Variables
+
+You run a regression where you control for five confounding variables.
+Your regression spits out seven numbers---an intercept, an estimated treatment effect, and a coefficient for each of the confounders.
+We all like to write long papers, so there's a natural inclination to write up an interpretation of each of these five confounder coefficients.
+Resist the temptation.
+These numbers are as good as meaningless.
+It doesn't matter if their signs are "what you expected" or not.
+The reason to control for confounding variables is to get a better estimate of the treatment effect.
+Once you've run the regression and retrieved that estimate, the confounders have done their job and can be left alone.
+
+Why can't we causally interpret the coefficients on the controls?
+The first issue is what we just talked about: post-treatment bias.
+If we think of a confounder $C$ as the "treatment", then $T$ is post-treatment with respect to $X$.
+Therefore, the inclusion of $T$ in the model biases the estimated effect of $C$, like any post-treatment variable would.
+Additionally, depending on the exact causal sequencing, other control variables you've included may also be post-treatment with respect to $C$, making interpretation all the more difficult.
+
+The second, more subtle issue is that even if you have controlled for all of the confounders of $T$, that doesn't mean you've controlled for the confounders of $C$.
+There could be other factors out there that affect both $C$ and $Y$.
+As long as they don't affect $T$, they need not be included in the model for valid estimation of the causal effect of $T$.
+But you *would* need them if you also wanted to estimate the causal effect of $C$.
+
+The bottom line is --- if what you're really interested in is the effect of some other variable $C$, then set up a causal analysis with that as the treatment.
+Otherwise, don't try to stretch your causal analysis of $T$ into a causal analysis of $C$ as well.
+Different causal questions require different models.
+For more on the causal interpretation of control variables, see @keele2020causal.
+
+### Signing the Bias?
+
+*For this section I relied on lecture notes from Frank Wolak's econometrics course at Stanford, which were provided to me by Peter Schram.*
+
+Virtually every observational study in political science suffers from unobserved confounding.
+It's a natural consequence of doing observational work.
+Political scientists (and other social scientists working with observational data) will often make claims like "If anything, my results are biased downward."
+The ostensible logic of these claims is something like the following:
+
+*   We claim $T$ has a positive average treatment effect on $Y$.
+
+*   Yes, $C$ is an unobserved confounder in the relationship between treatment $T$ and outcome $Y$.
+
+*   But theory/previous work/common sense tells us:
+
+    1.  $C$ is positively correlated with $T$
+    2.  $C$ is negatively correlated with $Y$
+
+*   Therefore, if anything, our results would only get stronger if we controlled for $C$!
+
+This logic works ... if $T$ and $C$ are the only two variables in the equation.
+But usually you have a bunch of other controls.
+In order to "sign the bias", you'd have to be able to say:
+
+*   $C$ is positively correlated with $T$, *after controlling for all other variables included in the model.*
+
+*   $C$ is negatively correlated with $Y$, *after controlling for $T$ and all other variables included in the model.*
+
+Your argument has to be about these *conditional* correlations, which are much more difficult to think through than unconditional correlations, and which are highly dependent on exactly which other control variables are included in the regression model.
+And if some of the other controls are themselves affected by $C$, that makes it all the harder to speculate about what the conditional correlation looks like---everything we said about post-treatment bias above will apply.
+
+The best way to defend your work isn't to make specious claims attempting to sign the bias.
+It's to use the most credible research design possible, given your research question and the feasibility of data collection.
+If the question is amenable to running a randomized experiment, do that!
+If you're stuck using observational data, accept the fact that you won't be able to eliminate every conceivable source of unobserved confounding.
+Science is progressive---the goal isn't to produce a perfect and unquestionable study, but rather to improve on what's come before.
+
+We won't go through this in class, but in case you're curious, here's a formal proof of the claims made here.
+Imagine the population regression equation is
+$$
+\mathbf{Y} = \mathbf{X} \beta + \mathbf{C} \gamma + \epsilon,
+$$
+where:
+
+*   $\mathbf{Y}$ is an $N \times 1$ vector containing the response;
+
+*   $\mathbf{X}$ is an $N \times K$ matrix of observed covariates (including the treatment), with associated $K \times 1$ vector of coefficients $\beta$;
+
+*   $\mathbf{C}$ is an $N \times 1$ vector containing an unobserved confounder, with associated (scalar) coefficient $\gamma$;
+
+*   $\epsilon$ is an $N \times 1$ vector containing the error term.
+
+As $\mathbf{C}$ is unobserved, suppose instead we run the misspecified regression
+$$
+\mathbf{Y} = \mathbf{X} \alpha + \upsilon,
+$$
+using OLS to estimate $\alpha$.
+The expected value of the OLS estimate, taking both the observed covariates and the unobserved confounder as fixed, is
+$$
+\begin{aligned}
+\mathbb{E} \left[ \hat{\alpha} \,|\, \mathbf{X}, \mathbf{C} \right]
+&= \mathbb{E} \left[ (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{Y} \,|\, \mathbf{X}, \mathbf{C} \right] \\
+&= (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbb{E} \left[ \mathbf{Y} \,|\, \mathbf{X}, \mathbf{C} \right] \\
+&= (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \left[ \mathbf{X} \beta + \mathbf{C} \gamma \right] \\
+&= \beta + \underbrace{(\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{C}}_{\delta} \gamma.
+\end{aligned}
+$$
+In the final equation, $\delta$ is the $K \times 1$ vector consisting of the coefficients from a regression of $\mathbf{C}$ on $\mathbf{X}$.
+So if we want to say that some element of $\hat{\alpha}$ is an underestimate, relative to the corresponding "true" value in $\beta$, we must be able to say one of:
+
+*   The corresponding element of $\delta$ is negative, and $\gamma$ is positive.
+
+*   The corresponding element of $\delta$ is positive, and $\gamma$ is negative.
