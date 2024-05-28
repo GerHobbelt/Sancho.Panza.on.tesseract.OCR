@@ -235,13 +235,19 @@ We played Deal or No Deal and were given the following offers.
 
 (a) In one round we were given the offer of $\$289,154$ with six suitcases left containing $\$1,\$400,\$5000,\$500000,\$750000,$ and $\$1000000$. 
 
-```{r nice-fig-810, fig.cap='Banker offers $289,154.', out.width='70%', fig.asp=.75, fig.align='center', echo=FALSE}
+<!-- https://stackoverflow.com/questions/72434109/including-symbol-in-table-caption-of-bookdown-latex-table -->
+
+(ref:nice-fig-810-cap) Banker offers $289,154.
+
+```{r nice-fig-810, fig.cap='(ref:nice-fig-810-cap)', out.width='70%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/deal_no_deal_round4.png")
 ```
 
 Then, after opening two more suitcases leaving $\$1,\$400,\$500000,$ and $\$1000000$ we were offered $\$317,393$. 
 
-```{r nice-fig-811, fig.cap='Banker offer increases to $317,393.', out.width='70%', fig.asp=.75, fig.align='center', echo=FALSE}
+(ref:nice-fig-811-cap) Banker offer increases to $317,393.
+
+```{r nice-fig-811, fig.cap='(ref:nice-fig-811-cap)', out.width='70%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/deal_no_deal_round5.png")
 ```
 
@@ -250,7 +256,9 @@ Use mathematical expectation to explain why it makes sense that the banker's off
 
 (b) In the next round we opened one more suitcase and the $\$500000$ suitcase was now gone and only the $\$1, \$400$, and $\$1000000$ were left. 
 
-```{r nice-fig-812, fig.cap='Banker offers now $294,991.', out.width='70%', fig.asp=.75, fig.align='center', echo=FALSE}
+(ref:nice-fig-812-cap) Banker offers now $294,991.
+
+```{r nice-fig-812, fig.cap='(ref:nice-fig-812-cap)', out.width='70%', fig.asp=.75, fig.align='center', echo=FALSE}
 knitr::include_graphics("01-basics-figures/deal_no_deal_round6.png")
 ```
 
