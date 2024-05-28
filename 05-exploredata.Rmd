@@ -4,7 +4,7 @@ Explore the dataset interactively in the following map, or access a full-sized v
 
 Data is available for download at https://arcticdata.io/catalog/view/doi:10.18739/A2MK6591G
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, eval=FALSE}
 library(raster)
 library(leaflet)
 library(maptools)
@@ -59,7 +59,7 @@ colnames(O2labels)[1] <- gsub('^...','',colnames(O2labels)[1])
  
 ```
 
-```{r, include=FALSE}
+```{r, include=FALSE, eval=FALSE}
 allImage <- read.csv("C:/Users/Bri/Documents/CSU/Dissertation/AK_Lakes/GLOFs/ImagesDatesALL.csv")
 lakesbyyear <- read.csv("C:/Users/Bri/Documents/CSU/Dissertation/AK_Lakes/GLOFs/LakesbyYear.csv")
 GLOFshp <- readOGR("Y:/dmcgrath/Glacier/Bri/AK_Lakes/FinalOutlines/GLOFevents.shp", layer="GLOFevents", stringsAsFactors = T)
@@ -125,7 +125,7 @@ eventsbyyear <- eventsbyyear %>% left_join(distinct(select(imYear, c( "Year", "n
 ```
 
 
-```{r cars, include=FALSE}
+```{r cars, include=FALSE, eval=FALSE}
 
 O2Regions@data <-  O2Regions@data %>% 
   left_join(distinct(select(O2labels, c("O2Region","NameReg", "TotalGlacArea", "PercDebCover", "Nlakes", "TotalLakeArea", "SpecificMB", "SpecificMBerr")), O2Region, .keep_all=TRUE), by=c("O2Region"))
@@ -296,7 +296,7 @@ title <- tags$div(
 
 
 
-```{r AKmap, include=FALSE}
+```{r AKmap, include=FALSE, eval=FALSE}
 timelabels <- c("1984-1988", "1997-2001", "2007-2011", "2016-2019")
 damlabels <- c("Bedrock", "Ice", "Moraine", "Supraglacial")
 stablabels <- c("Forms after 1984-1988", "Forms then drains", "Drains before 2016-2019", "Drains then reappears", "Present in all time periods")
@@ -384,6 +384,6 @@ AKmap <- leaflet(lakesshp) %>%
   
 ```
 
-```{r mapOut, out.width = '100%', echo=FALSE}
+```{r mapOut, out.width = '100%', echo=FALSE, eval=FALSE}
 AKmap
 ```

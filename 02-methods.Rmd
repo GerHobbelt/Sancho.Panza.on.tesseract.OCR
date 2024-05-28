@@ -7,7 +7,7 @@ Cloud-free mosaics were compiled in Google Earth Engine (GEE), an open source, w
 
 
 ```{r nice-fig, fig.cap='Here is a nice figure!', out.width='80%', fig.asp=.75, fig.align='center',  echo=FALSE}
-tab1 <- read.csv("C:/Users/Bri/Documents/CSU/EnvDataScience2022/bookdown-demo/images/bookdownTable1.csv")
+tab1 <- read.csv("images/bookdownTable1.csv")
 
 
 knitr::kable(
@@ -22,7 +22,7 @@ Image composites were classified in ArcGIS Pro using an object-based supervised 
 
 <br>
 
-![ General workflow for creating the ice-marginal lake inventory for time periods 1984–1988, 1997–2001, 2007–2011, and 2016–2019.](.\images/f02.jpg)
+![ General workflow for creating the ice-marginal lake inventory for time periods 1984–1988, 1997–2001, 2007–2011, and 2016–2019.](./images/f02.jpg)
 
 <br>
 All lake outlines were visually inspected and, if necessary, the lake margins were manually adjusted to produce a final delineation (Fig. S2). Lakes were added or excluded based on visual inspection and consideration of all four time steps together; lakes <0.05 km^2^ were manually added back in if the lake grew in subsequent years to minimize false signals of lake formation. Lakes which coalesced or separated over time were given the same Lake ID to minimize misclassification of a lake forming or draining. Every lake in each time step was then classified by i) dam type (Sect. 2.3.1), ii) topological position (Sect. 2.3.2), and iii) stability (Sect. 2.3.3).
