@@ -1,7 +1,11 @@
-.PHONY: html pdf
+.PHONY: html pdf epub
 
-html :
+html:
 	Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::gitbook')"
 
-pdf :
+pdf:
 	Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::pdf_book')"
+
+epub:
+	Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::epub_book')"
+
