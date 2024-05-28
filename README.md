@@ -1,5 +1,7 @@
-[![Build Status](https://travis-ci.com/rstudio/bookdown-demo.svg?branch=master)](https://travis-ci.com/rstudio/bookdown-demo)
+Companion to BER 670: Rasch Techniques for Constructing and Evaluating Measurement Instruments
 
-This is a minimal example of a book based on R Markdown and **bookdown** (https://github.com/rstudio/bookdown). Please see the page "[Get Started](https://bookdown.org/yihui/bookdown/get-started.html)" at https://bookdown.org/yihui/bookdown/ for how to compile this example into HTML. You may generate a copy of the book in `bookdown::pdf_book` format by calling `bookdown::render_book('index.Rmd', 'bookdown::pdf_book')`. More detailed instructions are available here https://bookdown.org/yihui/bookdown/build-the-book.html.
+This book is still in progress !!! This is a draft. Several sections are still incomplete or unedited.
 
-You can find the preview of this example at https://bookdown.org/yihui/bookdown-demo/.
+This book is written to help students enrolled in the University of Alabama, Rasch Measurement Theory (BER 670) course led by Professor Stefanie Wind.
+
+We hope that the book will be a useful resource to help you learn both R and statistics. If you have any suggestions for improvements, please get in touch with your lovely TA: Cheng Hua, at chua@crimson.ua.edu
