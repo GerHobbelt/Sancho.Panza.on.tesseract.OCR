@@ -1,0 +1,57 @@
+# Case Study -  The Problem of the Points {#case_study_problem_of_the_points}
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+library(mosaic)
+library(animation)
+set.seed(2018)
+```
+
+
+## Chapter Scenario - The BART Series {#chapter_scenario_the_bart_series}
+
+Suppose a game is stopped midway. How should the stakes be split if the game is not complete  but one player is ahead of the other? This famous problem is known as the “Problem of the Points” and stimulated Blaise Pascal to generate some new ideas early in the development of probability theory. In this application we see how our tool of drawing tree diagrams helps us think it through. 
+
+Let’s use baseball as an example. In the Major League Baseball World Series, teams play a series of up to seven games and the first team to win four games wins the series and is declared “world champions” (even though it is just the U.S. and a few Canadian teams). 
+
+An interesting thing happened in the 1989 World Series between the Oakland Athletics and the San Francisco Giants, often called the “Battle of the Bay” or the “BART Series” for the Bay Area Rapid Transit System one would take to the opposite sides of the San Francisco Bay. The Oakland A’s were ahead two games to nothing when the interesting thing happened - an earthquake. Here is how Wikipedia describes it:
+
+"On October 17, just minutes before the start of Game 3, a magnitude 6.9 earthquake struck the Bay Area causing significant damage to both Oakland and San Francisco. Candlestick Park in San Francisco suffered damage to its upper deck as pieces of concrete fell from the baffle at the top of the stadium and the power was knocked out. The game was postponed out of concerns for the safety of everyone in the ballpark as well as the loss of power, with Vincent later saying that he did not know when play would resume." (https://en.wikipedia.org/wiki/1989_World_Series)
+
+Suppose the series had to be permanently suspended at this point. How should the prize money be split? This is essentially an example of the famous “problem of the points.” What do you think would be a fair division of the prize money between the Oakland A’s and the San Francisco Giants? In other words, what percentage of the prize money should the Oakland A’s get and what percentage of the prize money should the San Francisco Giants get? We will use a tree diagram to solve this problem but let's start with a simpler case. 
+
+## A Simpler Case - A Three-Two Split
+
+Suppose the LA Dodgers and the Houston Astros are in the World Series and the Dodgers are ahead of the Astros 3-2. We can use a tree diagram to decide on the fair division of the prize money should the series be suspended at this point.
+
+With five games already played, there are potentially two remaining games which can be described in a tree diagram where D represents a Dodger win and A represents an Astros win. Assuming each team has the same chance of winning a new game, the four branches are equally likely.  If the Dodgers win one more game, they win the series. Three of the four include at least one Dodger win and only one branch shows Houston winning the series, so a fair way to split the prize money would be a 3:1 split with the Dodgers receiving 75% of the prize money and Houston receiving 25%.
+
+Once we are comfortable we can see a shortcut to solve the problem of the points. With two remaining games left and the Dodgers needing only one to win we can examine the second row of Pascal's triangle and identify the appropriate point in the row that represents at least on Dodger win.
+
+$$ \dbinom{2}{0} : \dbinom{2}{1} + \dbinom{2}{2}$$
+
+You may have noticed that if the Dodgers win the next game a seventh game is not played but is included in the tree diagram. The extra branches were included in the diagram so that we could examine equally likely cases. An alternative is to place probabilities on the branches and terminate the tree when the series is over as in the diagram below.
+
+$$P(\text{Dodgers win})=0.5 + 0.5 \cdot 0.5 = 0.75$$
+$$P(\text{Astros win})=0.5 \cdot 0.5=0.25$$
+
+Thus, the split should be 75:25 or 3:1 in favor of the Dodgers.
+
+## Chapter Scenario Revisited - The BART Series {#chapter_scenario_revisited_the_bart_series}
+
+In the original problem the Dodgers are ahead of the Astros 2 games to 0 with a potential of 5 remaining games yielding a tree diagram with 32 equally likely outcomes. If the Dodgers win 2 of the games they win the series.
+
+In the tree diagram, there are 26 brances in which the Dodgers win the series and 6 in which the Astros win the series meaning the prize money should be split 26:6 in favor of the Dodgers.
+
+Solving using Pascal's triangle, for the five potential games, if the Dodgers win at least two they win the series.
+
+$$\dbinom{5}{0} + \dbinom{5}{1} : \dbinom{5}{2} + \dbinom{5}{3} + \dbinom{5}{4} + \dbinom{5}{5}$$ 
+
+$$1+5:10+10+5+1 = 6:26$$
+
+
+### Exercise - A Three:One Split
+Suppose the LA Dodgers and the Houston Astros are in the World Series and the Dodgers are ahead of the Astros 3-1. Use a tree diagram to decide on the fair division of the prize money should the series be suspended at this point.
+
+### Exercise - A Three:Zero Split
+Suppose the LA Dodgers and the Houston Astros are in the World Series and the Dodgers are ahead of the Astros 3-0. Use combinations and Pascal’s Triangle to decide on the fair division of the prize money should the series be suspended at this point.
+
