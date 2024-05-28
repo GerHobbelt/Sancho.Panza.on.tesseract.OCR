@@ -14,7 +14,7 @@
 % Install the Iosevka fonts in the `C:/texlive/2024/texmf-dist/fonts/truetype/public/` fonts directory where the others already are.) 
 % It can be obtained at https://github.com/be5invis/Iosevka -> Releases.
 %
-% Run `fc-cache -f --verbose` to refresh the xetex / fontconfig cache (as seen at https://github.com/NixOS/nixpkgs/issues/24485, but this works for a TeX install on MSWindows too, fortunately)
+% Run `fc-cache -f --verbose` to refresh the XeTeX / fontconfig cache (as seen at https://github.com/NixOS/nixpkgs/issues/24485, but this works for a TeX install on MSWindows too, fortunately)
 %
 % WARNING: ^^^ execute the above command in an ADMINISTRATOR command shell or you will be treated to all sorts of fontconfig crashes and "Fontconfig error: No writable cache directories"!
 %
@@ -35,7 +35,7 @@
 %
 
 %
-% Incidentally, when you're fiddling with this premable stuff, it's much faster to just tweak the generated `.tex` file until you're satisfied.
+% Incidentally, when you're fiddling with this preamble stuff, it's much faster to just tweak the generated `.tex` file until you're satisfied.
 % The command to produce a PDF file straight off that one is:
 %
 %      xelatex -no-shell-escape probriskreward-bookdown.tex
