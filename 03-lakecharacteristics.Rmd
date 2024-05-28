@@ -1,0 +1,68 @@
+# Lake characteristics
+
+## Dam type classification
+
+Using a combination of DEMs and high-resolution satellite imagery (i.e., Maxar Technologies in Google Earth), each lake’s dam type was visually interpreted and manually classified (Buckel et al., 2018). Four different dam types were identified in this study (Fig. 3): 
+
+* _Moraine-dammed lakes_: most frequently located at the glacier terminus, impounded behind a terminal or lateral moraine (Otto, 2019);
+
+* _Ice-dammed lakes_: located along glacier margins or within tributary valleys and blocked by glacier; 
+
+* _Supraglacial lakes_: found on the surface of the glacier, often dammed by glacier surface topography (ice or debris) within the ablation zone. For this study, we only observe supraglacial lakes within debris cover; and 
+
+* _Bedrock-dammed lakes_: frequently located in cirques with minimal remaining glacial ice, or in other overdeepenings created from glacial erosion (Otto, 2019).
+
+<center>
+
+![Examples of typical lake behavior for each dam type (moraine (a-b), ice (c-d), supraglacial (def), and bedrock(g-h)), and changes in lake area from 1984–1988 (left; red) and 2016–2019 (right; blue). False color images using Landsat bands for shortwave infrared (SWIR), near infrared (NIR), and red. ](.\images/f03.jpg){width=75%}
+
+</center>
+
+## Topological positions
+
+In addition to dam type, all glacial lakes were classified based on their spatial relationship to their source glacier (Nie et al., 2017; Rounce et al., 2017), into one of the following categories:
+
+* _Proglacial_: lakes at the terminus of the glacier, in contact with the ice;
+
+* _Supraglacial_: lakes on the surface of the glacier, most commonly within debris; 
+
+* _Detached_: lakes fed by glaciers but not in contact with ice;
+
+* _Unconnected_: detached lakes not fed by glaciers; or
+
+* _Ice_: ice-dammed lakes located at ice margins or in tributary valleys. 
+
+
+## Lake stability classification
+
+Lake stability simply refers to whether or not a lake is present, rather than the stability of the lake shoreline. Five stability classifications are identified within this dataset:
+
+* _Forms_: lakes which appear after 1984–1988 and are present in every mosaic through 2016–2019;
+
+* _Forms-Drains_: lakes which form after 1984–1988 and drain by 2016–2019;
+
+* _Drains_: lakes which were present in 1984–1988 and disappear by 2016–2019;
+
+* _Drains-Refills_: lakes which are present in 1984–1988, are not present for one or two time steps, then reappear by 2016–2019; or
+
+* _Persistent_: lakes which are present in all four time steps.
+
+## Lake area change
+
+Absolute area change (ΔA) was calculated for all lakes present in the latest time step (2016–2019), taken as the difference between the last (2016–2019) and first (either 2007–2011, 1997–2001, or 1984–1988) outline for each lake. For lakes which first appear in the 2016–2019 composite, ΔA is equal to lake area in 2016–2019. Rate of change (km^2^ per decade, calculated between the midpoint of each interval) was also calculated to minimize bias of longer standing lakes having a larger area change. Rate of change per time step was also calculated to compare rates of area change over time. 
+
+## Error
+
+Error in lake delineation was calculated assuming an error of ± 1 pixel for the entirety of each lake perimeter (Chen et al., 2021):  
+$$
+E = P * R
+$$
+
+where P is the perimeter of the lake (km), R is the pixel resolution of the imagery (0.030 km for Landsat), and the resulting error (E) is in km^2^.  This error calculation is more generous than numerous lake inventories which assume ± 0.5 pixel error (e.g., Fujita et al., 2009; Salerno et al., 2012; Zhang et al., 2015; Nie et al., 2017; Rounce et al., 2017; Wang et al., 2020). 
+
+Error for the difference in areas was calculated using the theory of propagation of uncorrelated error:
+$$
+E_{diff} = \sqrt{E_x^2+E_y^2} ) 
+$$
+
+Where $E_x$ and $E_y$ are the error for the first and second lake outlines, respectively. Lakes where the area difference was greater than $E_{diff}$ were determined to have detectable area change. 

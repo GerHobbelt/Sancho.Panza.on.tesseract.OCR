@@ -1,0 +1,145 @@
+`r if (knitr:::is_html_output()) '
+# References {-}
+'`
+Anderson, L. S. and Anderson, R. S.: Modeling debris-covered glaciers: Response to steady debris deposition, 10, 1105–1124, https://doi.org/10.5194/tc-10-1105-2016, 2016.
+
+Anderson, S. P., Walder, J. S., Anderson, R. S., Kraal, E. R., Cunico, M., Fountain, A. G., and Trabant, D. C.: Integrated hydrologic and hydrochemical observations of Hidden Creek Lake jokulhlaups, Kennicott Glacier, Alaska, J. Geophys. Res., 108, 1–19, https://doi.org/10.1029/2002JF000004, 2003.
+
+Benn, D. I., Wiseman, S., and Hands, K. A.: Growth and drainage of supraglacial lakes on debrismantled Ngozumpa Glacier, Khumbu Himal, Nepal, J. Glaciol., 47, 626–638, https://doi.org/10.3189/172756501781831729, 2001.
+
+Brun, F., Wagnon, P., Berthier, E., Jomelli, V., Maharjan, S. B., Shrestha, F., and Kraaijenbrink, P. D. A.: Heterogeneous Influence of Glacier Morphology on the Mass Balance Variability in High Mountain Asia, J. Geophys. Res. Earth Surf., 124, 1331–1345, https://doi.org/10.1029/2018JF004838, 2019.
+
+Buckel, J., Otto, J. C., Prasicek, G., and Keuschnig, M.: Glacial lakes in Austria - Distribution and formation since the Little Ice Age, Glob. Planet. Change, 164, 39–51, https://doi.org/10.1016/j.gloplacha.2018.03.003, 2018.
+
+Capps, D. M., Wiles, G. C., Clague, J. J., and Luckman, B. H.: Tree-ring dating of the nineteenth-century advance of Brady Glacier and the evolution of two ice-marginal lakes, Alaska, 21, 641–649, https://doi.org/10.1177/0959683610391315, 2011.
+
+Carrivick, J. L. and Quincey, D. J.: Progressive increase in number and volume of ice-marginal lakes on the western margin of the Greenland Ice Sheet, Glob. Planet. Change, 116, 156–163, https://doi.org/10.1016/j.gloplacha.2014.02.009, 2014.
+
+Carrivick, J. L. and Tweed, F. S.: Proglacial lakes : character, behaviour and geological importance, Quat. Sci. Rev., 78, 34–52, https://doi.org/10.1016/j.quascirev.2013.07.028, 2013.
+
+Carrivick, J. L. and Tweed, F. S.: A global assessment of the societal impacts of glacier outburst fl oods, Glob. Planet. Change, 144, 1–16, 2016.
+
+Chen, F., Zhang, M., Guo, H., Allen, S., Kargel, J., Haritashya, U., and Watson, C. S.: Annual 30-meter Dataset for Glacial Lakes in High Mountain Asia from 2008 to 2017, Earth Syst. Sci. Data Discuss., 4275164, 1–29, https://doi.org/10.5194/essd-2020-57, 2021.
+
+Clague, J. J. and Evans, S. G.: A review of catastrophic drainage of moraine-dammed lakes in British Columbia, Quat. Sci. Rev., 19, 1763–1783, https://doi.org/10.1016/S0277-3791(00)00090-1, 2000.
+
+Colonia, D., Torres, J., Haeberli, W., Schauwecker, S., Braendle, E., Giraldez, C., and Cochachin, A.: Compiling an Inventory of Glacier-Bed Overdeepenings and Potential New Lakes in De-Glaciating Areas of the Peruvian Andes: Approach , First Results , and Perspectives for Adaptation to Climate Change, 9, https://doi.org/10.3390/w9050336, 2017.
+
+Cook, S. J. and Quincey, D. J.: Estimating the volume of Alpine glacial lakes, Earth Surf. Dyn., 559–575, https://doi.org/10.5194/esurf-3-559-2015, 2015.
+
+Cook, S. J., Kougkoulos, I., Edwards, L. A., Dortch, J., and Hoffmann, D.: Glacier change and glacial lake outburst flood risk in the Bolivian Andes, Cryosph., 10, 2399–2413, https://doi.org/10.5194/tc-10-2399-2016, 2016.
+
+Dorava, J. M. and Milner, A. M.: Role of lake regulation on glacier fed rivers in enhancing salmon productivity: The Cook Inlet watershed south central Alaska, USA, Hydrol. Process., 14, 3149–3159, https://doi.org/10.1002/1099-1085(200011/12)14:16/17<3149::AID-HYP139>3.0.CO;2-Y, 2000.
+
+Emmer, A.: Glacier Retreat and Glacial Lake Outburst Floods (GLOFs), in: Oxford Research Encyclopedia of Natural Hazard Science, 1–37, https://doi.org/10.1093/acrefore/9780199389407.013.275, 2017.
+
+Emmer, A., Merkl, S., and Mergili, M.: Spatiotemporal patterns of high-mountain lakes and related hazards in western Austria, 246, 602–616, https://doi.org/10.1016/j.geomorph.2015.06.032, 2015.
+
+Emmer, A., Harrison, S., Mergili, M., Allen, S., Frey, H., and Huggel, C.: 70 years of lake evolution and glacial lake outburst floods in the Cordillera Blanca (Peru) and implications for the future, 365, 107178, https://doi.org/10.1016/j.geomorph.2020.107178, 2020.
+
+Farinotti, D., Huss, M., Fürst, J. J., Landmann, J., Machguth, H., Maussion, F., and Pandit, A.: A consensus estimate for the ice thickness distribution of all glaciers on Earth, Nat. Geosci., 12, 168–173, https://doi.org/10.1038/s41561-019-0300-3, 2019.
+
+Field, H., Armstrong, W., and Huss, M.: Topography exerts primary control on the rate of Gulf of Alaska ice-marginal lake area change over the Landsat record, Cryosph. Discuss., 1–34, https://doi.org/10.5194/tc-2020-366, 2021.
+
+Fujita, K., Sakai, A., Nuimura, T., Yamaguchi, S., and Sharma, R. R.: Recent changes in Imja Glacial Lake and its damming moraine in the Nepal Himalaya revealed by in situ surveys and multi-temporal ASTER imagery, Environ. Res. Lett., 4, https://doi.org/10.1088/1748-9326/4/4/045205, 2009.
+
+Furian, W., Loibl, D., and Schneider, C.: Future glacial lakes in High Mountain Asia: An inventory and assessment of hazard potential from surrounding slopes, J. Glaciol., https://doi.org/10.1017/jog202118, 2021.
+
+Gardelle, J., Arnaud, Y., and Berthier, E.: Contrasted evolution of glacial lakes along the Hindu Kush Himalaya mountain range between 1990 and 2009, Glob. Planet. Change, 75, 47–55, https://doi.org/10.1016/j.gloplacha.2010.10.003, 2011.
+
+Glasser, N. F., Holt, T. O., Evans, Z. D., Davies, B. J., Pelto, M., and Harrison, S.: Recent spatial and temporal variations in debris cover on Patagonian glaciers, 273, 202–216, https://doi.org/10.1016/j.geomorph.2016.07.036, 2016.
+
+Herreid, S. and Pellicciotti, F.: The state of rock debris covering Earth’s glaciers, Nat. Geosci., https://doi.org/10.1038/s41561-020-0615-0, 2020.
+
+How, P., Messerli, A., Mätzler, E., Santoro, M., Wiesmann, A., Caduff, R., Langley, K., Bojesen, M. H., Paul, F., Kääb, A., and Carrivick, J. L.: Greenland-wide inventory of ice marginal lakes using a multi-method approach, Sci. Rep., 11, 1–13, https://doi.org/10.1038/s41598-021-83509-1, 2021.
+
+Huggel, C., Kääb, A., Haeberli, W., and Teysseire, P.: Remote sensing based assessment of hazards from glacier lake outbursts : A case study in the Swiss Alps, Canandian Geotech. J., 39, 3160330, https://doi.org/10.1139/t01-099, 2002.
+
+Immerzeel, W. W., Lutz, A. F., Andrade, M., Bahl, A., Biemans, H., Bolch, T., Hyde, S., Brumby, S., Davies, B. J., Elmore, A. C., Emmer, A., Feng, M., Fernández, A., Haritashya, U., Kargel, J. S., Koppes, M., Kraaijenbrink, P. D. A., Kulkarni, A. V., Mayewski, P. A., Nepal, S., Pacheco, P., Painter, T. H., Pellicciotti, F., Rajaram, H., Rupper, S., Sinisalo, A., Shrestha, A. B., Viviroli, D., Wada, Y., Xiao, C., Yao, T., and Baillie, J. E. M.: Importance and vulnerability of the world’s water towers, Nature, 577, 364–369, https://doi.org/10.1038/s41586-019-1822-y, 2020.
+
+Jacquet, J., McCoy, S. W., McGrath, D., Nimick, D. A., Fahey, M., O’Kuinghttons, J., Friesen, B. A., and Leidich, J.: Hydrologic and geomorphic changes resulting from episodic glacial lake outburst floods: Rio Colonia, Patagonia, Chile, Geophys. Res. Lett., 44, 854–864, https://doi.org/10.1002/2016GL071374, 2017.
+
+Jakob, L., Gourmelen, N., Ewart, M., and Plummer, S.: Ice loss in High Mountain Asia and the Gulf of Alaska observed by CryoSat-2 swath altimetry between 2010 and 2019, Cryosph. Discuss., 1–29, https://doi.org/10.5194/tc-2020-176, 2021.
+
+Jones, K. W. and Wolken, G. J.: VALDEZ GLACIER ICE-DAMMED LAKE : JUNE 2018 GLACIAL LAKE OUTBURST, State Alaska Dep. Nat. Resour. Div. Geol. Geophys. Surv., 2019.
+
+Kaufman, D. S. and Manley, W. F.: Pleistocene Maximum and Late Wisconsinan glacier extents across Alaska, U.S.A., Dev. Quat. Sci., 2, 9–27, https://doi.org/10.1016/S1571-0866(04)80182-9, 2004.
+
+Kienholz, C., Pierce, J., Hood, E., Amundson, J. M., Wolken, G. J., Jacobs, A., Hart, S., Wikstrom Jones, K., Abdel-Fattah, D., Johnson, C., and Conaway, J. S.: Deglacierization of a Marginal Basin and Implications for Outburst Floods, Mendenhall Glacier, Alaska, Front. Earth Sci., 8, 1–21, https://doi.org/10.3389/feart.2020.00137, 2020.
+
+King, O., Bhattacharya, A., Bhambri, R., and Bolch, T.: Glacial lakes exacerbate Himalayan glacier mass loss, Sci. Rep., 9, 1–9, https://doi.org/10.1038/s41598-019-53733-x, 2019.
+
+Larsen, C. F., Burgess, E., Arendt, A. A., O’Neel, S., Johnson, A. J., and Kienholz, C.: Surface melt dominates Alaska glacier mass balance, Geophys. Res. Lett., 42, 5902–5908, https://doi.org/10.1002/2015GL064349, 2015.
+
+Linsbauer, A., Frey, H., Haeberli, W., Machguth, H., Azam, M. F., and Allen, S.: Modelling glacier-bed overdeepenings and possible future lakes for the glaciers in the Himalaya – Karakoram region, Ann. Glaciol., 57, 119–130, https://doi.org/10.3189/2016AoG71A627, 2016.
+
+Maurer, J. M., Schaefer, J. M., Rupper, S., and Corley, A.: Acceleration of ice loss across the Himalayas over the past 40 years, Sci. Adv., 5, https://doi.org/10.1126/sciadv.aav7266, 2019.
+
+Meerhoff, E., Castro, L. R., Tapia, F. J., and Pérez-Santos, I.: Hydrographic and Biological Impacts of a Glacial Lake Outburst Flood (GLOF) in a Patagonian Fjord, 42, 132–143, https://doi.org/10.1007/s12237-018-0449-9, 2018.
+
+Melkonian, A. K., Willis, M. J., and Pritchard, M. E.: Satellite-derived volume loss rates and glacier speeds for the Juneau Icefield, Alaska, J. Glaciol., 60, 743–760, https://doi.org/10.3189/2014JoG13J181, 2014.
+
+Melkonian, A. K., Willis, M. J., and Pritchard, M. E.: Stikine icefield mass loss between 2000 and 2013/2014, Front. Earth Sci., 4, 1–12, https://doi.org/10.3389/feart.2016.00089, 2016.
+
+Miller, J. A., Whitehead, R. L., Gingerich, S. B., Oki, D. S., and Olcott, P. G.: Ground Water Atlas of the United States - Segment 13 - Alaska, Hawaii, Puerto Rico and the U.S. Virgin Islands, 4–5 pp., 1999.
+
+Milner, A. M., Robertson, A. L., Monaghan, K. A., Veal, A. J., and Flory, E. A.: Colonization and development of an Alaskan stream community over 28 years, Front. Ecol. Environ., 6, 413–419, https://doi.org/10.1890/060149, 2008.
+
+Nie, Y., Sheng, Y., Liu, Q., Liu, L., Liu, S., Zhang, Y., and Song, C.: A regional-scale assessment of Himalayan glacial lake changes using satellite observations from 1990 to 2015, Remote Sens. Environ., 189, 1–13, https://doi.org/10.1016/j.rse.2016.11.008, 2017.
+
+Östrem, G.: Ice Melting under a Thin Layer of Moraine, and the Existence of Ice Cores in Moraine Ridges, Geogr. Ann., 41, 228–230, https://doi.org/10.1080/20014422.1959.11907953, 1959.
+
+Otto, J.: Proglacial Lakes in High Mountain Environments: Landform and Sediment Dynamics in Recently Deglaciated Alpine Landscapes, in: Geography of the Physical Environment, edited by: Heckmann, T. and Morche, D., Springer Nature Switzerland, https://doi.org/10.1007/978-3-319-94184-4, 2019.
+
+Pelto, M., Capps, D., Clague, J. J., and Pelto, B.: Rising ELA and expanding proglacial lakes indicate impending rapid retreat of Brady Glacier, Alaska, Hydrol. Process., 27, 3075–3082, https://doi.org/10.1002/hyp.9913, 2013.
+
+Post, A. and Mayo, L. R.: Glacier Dammed Lakes and Outburst Floods in Alaska, Hydrol. Investig. Atlas HA-455, USGS, 1971.
+
+Pronk, J. B., Bolch, T., King, O., Wouters, B., and Benn, D. I.: Proglacial Lakes Elevate Glacier Surface Velocities in the Himalayan Region, 1–36, 2021.
+
+Reynolds, J. M.: On the formation of supraglacial lakes on debris-covered glaciers, IAHS-AISH Publ., 153–161, 2000.
+
+Rounce, D. R., Watson, C. S., and McKinney, D. C.: Identification of Hazard and Risk for Glacial Lakes in the Nepal Himalaya Using Satellite Imagery from 2000 – 2015, Remote Sens., 9, https://doi.org/10.3390/rs9070654, 2017.
+
+Salerno, F., Thakuri, S., D’Agata, C., Smiraglia, C., Manfredi, E. C., Viviano, G., and Tartari, G.: Glacial lake distribution in the Mount Everest region: Uncertainty of measurement and conditions of formation, Glob. Planet. Change, 92–93, 30–39, https://doi.org/10.1016/j.gloplacha.2012.04.001, 2012.
+
+Santos, J. and Córdova, C.: Little Ice Age glacial geomorphology and sedimentology of Portage Glacier, South-Central Alaska, Finisterra, 44, 95–108, https://doi.org/10.18055/finis1380, 2009.
+
+Shugar, D. H., Burr, A., Haritashya, U. K., Kargel, J. S., Watson, C. S., Kennedy, M. C., Bevington, A. R., Betts, R. A., Harrison, S., and Strattman, K.: Rapid worldwide growth of glacial lakes since 1990, Nat. Clim. Chang., 10, 939–945, https://doi.org/10.1038/s41558-020-0855-4, 2020.
+
+Solomina, O. N., Bradley, R. S., Hodgson, D. A., Ivy-Ochs, S., Jomelli, V., Mackintosh, A. N., Nesje, A., Owen, L. A., Wanner, H., Wiles, G. C., and Young, N. E.: Holocene glacier fluctuations, Quat. Sci. Rev., 111, 9–34, https://doi.org/10.1016/j.quascirev.2014.11.018, 2015.
+
+Solomina, O. N., Bradley, R. S., Jomelli, V., Geirsdottir, A., Kaufman, D. S., Koch, J., McKay, N. P., Masiokas, M., Miller, G., Nesje, A., Nicolussi, K., Owen, L. A., Putnam, A. E., Wanner, H., Wiles, G., and Yang, B.: Glacier fluctuations during the past 2000 years, Quat. Sci. Rev., 149, 61–90, https://doi.org/10.1016/j.quascirev.2016.04.008, 2016.
+
+Song, C., Sheng, Y., Wang, J., Ke, L., Madson, A., and Nie, Y.: Heterogeneous glacial lake changes and links of lake expansions to the rapid thinning of adjacent glacier termini in the Himalayas, 280, 30–38, https://doi.org/10.1016/j.geomorph.2016.12.002, 2017.
+
+Sturm, B. M. and Benson, S.: A history of jokulhlaups from strand line lake, alaska, u.s.a., 31, 1985.
+
+Tweed, F. S. and Carrivick, J. L.: Deglaciation and proglacial lakes, Geol. Today, 31, 96–102, 2015.
+
+Veh, G., Korup, O., and Walz, A.: Hazard from Himalayan glacier lake outburst floods, Proc. Natl. Acad. Sci. U. S. A., 117, 907–912, https://doi.org/10.1073/pnas.1914898117, 2020.
+
+Walder, J. S. and Costa, J. E.: Outburst floods from glacier-dammed lakes: The effect of mode of lake drainage on flood magnitude, Earth Surf. Process. Landforms, 21, 701–723, https://doi.org/10.1002/(SICI)1096-9837(199608)21:8<701::AID-ESP615>3.0.CO;2-2, 1996.
+
+Wang, S. J. and Zhou, L. Y.: Integrated impacts of climate change on glacier tourism, Adv. Clim. Chang. Res., 10, 71–79, https://doi.org/10.1016/j.accre.2019.06.006, 2019.
+
+Wang, X., Liu, S., Ding, Y., Guo, W., Jiang, Z., Lin, J., and Han, Y.: An approach for estimating the breach probabilities of moraine-dammed lakes in the Chinese Himalayas using remote-sensing data, Nat. Hazards Earth Syst. Sci., 12, 3109–3122, https://doi.org/10.5194/nhess-12-3109-2012, 2012.
+
+Wang, X., Ding, Y., Liu, S., and Jiang, L.: Changes of glacial lakes and implications in Tian Shan , central Asia , based on remote sensing data from 1990 to 2010, Environ. Res. Lett., 8, 11p, https://doi.org/10.1088/1748-9326/8/4/044052, 2013.
+
+Wang, X., Guo, X., Yang, C., Liu, Q., Wei, J., Zhang, Y., Liu, S., Zhang, Y., Jiang, Z., and Tang, Z.: Glacial lake inventory of High Mountain Asia (1990–2018) derived from Landsat images, Earth Syst. Sci. Data Discuss., 1–23, https://doi.org/10.5194/essd-2019-212, 2020.
+
+Welling, J., Árnason, T., and Ólafsdóttir, R.: Implications of climate change on nature-based tourism demand: A segmentation analysis of glacier site visitors in southeast Iceland, Sustain., 12, https://doi.org/10.3390/su12135338, 2020.
+
+Wiles, G. C., Barclay, D. J., and Calkin, P. E.: Tree-ring-dated “Little Ice Age” histories of maritime glaciers from western Prince William Sound, Alaska, 9, 163–173, https://doi.org/10.1191/095968399671927145, 1999.
+
+Wolfe, D. F. G., Kargel, J. S., and Leonard, G. J.: Glacier-dammed ice-marginal lakes of Alaska, 263–295 pp., https://doi.org/10.1007/978-3-540-79818-7, 2014.
+
+Worni, R., Huggel, C., and Stoffel, M.: Glacial lakes in the Indian Himalayas — From an area-wide glacial lake inventory to on-site and modeling based risk assessment of critical glacial lakes, Sci. Total Environ., 468–469, S71–S84, https://doi.org/10.1016/j.scitotenv.2012.11.043, 2013.
+
+Zemp, M., Huss, M., Thibert, E., Eckert, N., Mcnabb, R., Huber, J., Barandun, M., Machguth, H., Nussbaumer, S. U., Thomson, L., Paul, F., Maussion, F., Kutuzov, S., Cogley, J. G., Asia, C., Zealand, N., Canada, W., and Zealand, N.: Global glacier mass changes and their contributions to sea-level rise from 1961 to 2016, Nature, https://doi.org/10.1038/s41586-019-1071-0, 2019.
+
+Zhang, G., Yao, T., Xie, H., Wang, W., and Yang, W.: An inventory of glacial lakes in the Third Pole region and their changes in response to global warming, Glob. Planet. Change, 131, 148–157, https://doi.org/10.1016/j.gloplacha.2015.05.013, 2015.
+
+Zhang, M., Chen, F., and Tian, B.: An automated method for glacial lake mapping in High Mountain Asia using Landsat 8 imagery, J. Mt. Sci., 15, 13–24, https://doi.org/10.1007/s11629-017-4518-5, 2018.
+

@@ -1,0 +1,389 @@
+# Explore the data
+
+Explore the dataset interactively in the following map, or access a full-sized version [here.](https://briannarick.github.io/dataviz/AKmap_GLOF.html) Hover over any lake to discover the area, area change, dam type, lake position, and the associated glacier. 
+
+Data is available for download at https://arcticdata.io/catalog/view/doi:10.18739/A2MK6591G
+
+```{r setup, include=FALSE}
+library(raster)
+library(leaflet)
+library(maptools)
+library(rgdal)
+library(RColorBrewer)
+library(htmlwidgets)
+library(formattable)
+library(Hmisc)
+library(leaflet.minicharts)
+library(leaflet.opacity)
+library(shiny)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(ggthemes)
+library(htmltools)
+
+library(rgdal)
+library(raster)
+library(ggplot2)
+library(arcgisbinding)
+library(rgeos)
+library(dplyr)
+library(magicfor)
+library(tidyr)
+library(plotly)
+library(ggridges)
+library(ggpubr)
+library(gridExtra)
+library(formattable)
+library(ggridges)
+library(Hmisc)
+library(stringr)
+library(ggallin)
+library(gtable)
+library(lubridate)
+library(dygraphs)
+library(mapview)
+library(stringr)
+
+#setwd("Y:/dmcgrath/Glacier/Bri/AK_Lakes/FinalOutlines/")
+
+lakespts <- readOGR("Y:/dmcgrath/Glacier/Bri/AK_Lakes/FinalOutlines/AllLakes_AL_BR_Points.shp", layer="AllLakes_AL_BR_Points", stringsAsFactors = T)
+lakesshp <-readOGR("Y:/dmcgrath/Glacier/Bri/AK_Lakes/FinalOutlines/AllLakes_AL_BR.shp", layer="AllLakes_AL_BR", stringsAsFactors = T)
+O2Regions <-readOGR("Y:/dmcgrath/Glacier/Bri/AK_Lakes/O2Regions_AK.shp", layer="O2Regions_AK", stringsAsFactors = T)
+O2labels <- read.csv("Y:/dmcgrath/Glacier/Bri/AK_Lakes/FinalOutlines/O2Region_labels.csv")
+LGMextent <- readOGR("Y:/dmcgrath/Glacier/Bri/AK_Lakes/FinalOutlines/LGM_Extent.shp", layer="LGM_Extent", stringsAsFactors = T)
+PM1971 <- readOGR("Y:/dmcgrath/Glacier/Bri/AK_Lakes/FinalOutlines/PostMayo_All_WGS84_NoM.shp", layer="PostMayo_All_WGS84_NoM", stringsAsFactors = T)
+GLOFs <- readOGR("Y:/dmcgrath/Glacier/Bri/AK_Lakes/FinalOutlines/GLOFevents.shp", layer = "GLOFevents", stringsAsFactors = T)
+
+colnames(O2labels)[1] <- gsub('^...','',colnames(O2labels)[1])
+ 
+```
+
+```{r, include=FALSE}
+allImage <- read.csv("C:/Users/Bri/Documents/CSU/Dissertation/AK_Lakes/GLOFs/ImagesDatesALL.csv")
+lakesbyyear <- read.csv("C:/Users/Bri/Documents/CSU/Dissertation/AK_Lakes/GLOFs/LakesbyYear.csv")
+GLOFshp <- readOGR("Y:/dmcgrath/Glacier/Bri/AK_Lakes/FinalOutlines/GLOFevents.shp", layer="GLOFevents", stringsAsFactors = T)
+
+nLakes <- read.csv("C:/Users/Bri/Documents/CSU/Dissertation/AK_Lakes/GLOFs/nLakesperYearGLOF.csv")
+elevArea <- read.csv("C:/Users/Bri/Documents/CSU/Dissertation/AK_Lakes/GLOFs/ptsTopoAKDEM_Area.csv")
+colnames(allImage)[1] <- gsub('^...','',colnames(allImage)[1])
+colnames(lakesbyyear)[1] <- gsub('^...','',colnames(lakesbyyear)[1])
+colnames(nLakes)[1] <- gsub('^...','',colnames(nLakes)[1])
+
+allImage$date <- as.POSIXct(allImage$date, format = "%m/%d/%Y")
+allImage$MD <- format(allImage$date, "%m-%d")
+allImage$DOY <- yday(allImage$date)
+
+validImage <- allImage %>% filter(LakePresent < 3)
+invalidImage <- allImage %>% filter(LakePresent == 3)
+
+validImage <- validImage %>% mutate(DateFull = if_else(LakeID == lead(LakeID), (if_else(LakePresent == 1 & lead(LakePresent) == 0 | LakePresent == 1 & lead(LakePresent) == 0.5 | LakePresent == 0.5 & lead(LakePresent) == 0, date,NULL)), NULL)) %>% 
+  mutate(DateEmpty = if_else(LakeID == lead(LakeID), (if_else(LakePresent == 1 & lead(LakePresent) == 0 | LakePresent == 1 & lead(LakePresent) == 0.5 | LakePresent == 0.5 & lead(LakePresent) == 0, lead(date),NULL)), NULL))
+
+imPerYear <- validImage %>% group_by(Year, LakeID) %>% tally()
+imYear <- imPerYear %>% group_by(Year) %>% summarise(nImages = sum(n))
+
+events <- validImage %>%  drop_na(DateFull)
+events <- events %>% mutate(DOYfull = yday(DateFull)) %>% 
+  mutate(DOYempty = yday(DateEmpty)) %>% 
+  rowwise() %>% mutate(midDOY = mean(c(DOYempty, DOYfull), na.rm=T))
+events$Year <- as.integer(format(events$DateEmpty, format="%Y"))
+
+lakearea <- GLOFshp@data %>% select("LakeID", "Area", "LAST_Locat","dhdt")
+
+lakesbyyear <- lakesbyyear %>%  left_join(distinct(select(events, c("DateFull", "DateEmpty", "DOYfull", "DOYempty", "LakePresent", "Year", "LakeID")),  .keep_all=TRUE), by=c("Year", "LakeID"))
+lakesbyyear <- lakesbyyear %>% left_join(distinct(select(imPerYear, c( "Year", "LakeID", "n")),  .keep_all=TRUE), by=c("Year", "LakeID"))
+lakesbyyear <- lakesbyyear %>% left_join(distinct(select(elevArea, c("LakeID", "meanElev30m")),  .keep_all=TRUE), by = c("LakeID"))
+lakesbyyear <- lakesbyyear %>% mutate(detect = ifelse(n > 2, "y", "n")) %>% mutate(detect = replace(detect, is.na(detect), "n"))
+
+eventsbyyear <- lakesbyyear %>% group_by(Year) %>% 
+  summarise(nEvents = sum(LakePresent, na.rm = TRUE))
+
+events1320 <- eventsbyyear %>% filter(Year>2012) %>% summarise(sum = sum(nEvents))
+
+eventsbylake1320 <- lakesbyyear%>% filter(Year>=2013) %>% group_by(LakeID) %>% 
+  summarise(nEvents1320 = sum(LakePresent, na.rm = TRUE)) %>% 
+  mutate(MRI1320 = if_else(nEvents1320>0,10/nEvents1320, 0))
+
+eventsbylake <- lakesbyyear%>% group_by(LakeID) %>% 
+  summarise(nEvents = sum(LakePresent, na.rm = TRUE)) 
+
+eventsbylake <- eventsbylake %>% left_join(distinct(select(lakearea, c("LakeID", "Area", "LAST_Locat", "dhdt")),  .keep_all=TRUE), by=c("LakeID"))
+#eventsbylake <- eventsbylake %>% left_join(distinct(select(areaByYear, c("LakeID", "maxLakediff")),  .keep_all=TRUE), by=c("LakeID")) %>% mutate(MRI8520 = if_else(nEvents>0,35/nEvents, 0)) %>%  inner_join(eventsbylake1320, by = "LakeID")
+eventsbylake <- eventsbylake %>% left_join(distinct(select(elevArea, c("LakeID", "meanElev30m")),  .keep_all=TRUE), by=c("LakeID"))
+
+eventsNDetect <- lakesbyyear %>% filter(detect == "n") %>% group_by(Year) %>% 
+  tally()
+
+eventsYDetect <- lakesbyyear %>% filter(detect == "y") %>% group_by(Year) %>% 
+  tally()
+
+eventsbyyear <- eventsbyyear %>% left_join(distinct(select(eventsNDetect, c( "Year", "n")),  .keep_all=TRUE), by=c("Year"))
+eventsbyyear <- eventsbyyear %>% left_join(distinct(select(eventsYDetect, c( "Year", "n")),  .keep_all=TRUE), by=c("Year"))
+eventsbyyear <- eventsbyyear %>% mutate(PercEvents = (nEvents/n.y)*100)
+eventsbyyear <- eventsbyyear %>% left_join(distinct(select(imYear, c( "Year", "nImages")),  .keep_all=TRUE), by=c("Year"))
+```
+
+
+```{r cars, include=FALSE}
+
+O2Regions@data <-  O2Regions@data %>% 
+  left_join(distinct(select(O2labels, c("O2Region","NameReg", "TotalGlacArea", "PercDebCover", "Nlakes", "TotalLakeArea", "SpecificMB", "SpecificMBerr")), O2Region, .keep_all=TRUE), by=c("O2Region"))
+
+lakesshp@data <- lakesshp@data %>% mutate(Err30 = Perimeter*0.030)
+lakesshp@data$Dam_Type <- lakesshp@data$Dam_Type %>% str_replace_all(c("debris" = "supraglacial"))
+
+areaByYear <- lakesshp@data%>%
+  pivot_wider(id_cols = LakeID, names_from = YearStart, values_from = c(AREA_GEO, Err30), values_fn=sum)%>% 
+  left_join(distinct(select(lakesshp@data, c("LakeID", "Location", "Connection", "Dam_Type", "Region", "RGIId", "Area", "O2Region", "Surging", "Name")), LakeID, .keep_all=TRUE), by=c("LakeID")) %>%
+  mutate(Diff1684=AREA_GEO_2016-AREA_GEO_1984, Diff1607=AREA_GEO_2016-AREA_GEO_2007, Diff0797=AREA_GEO_2007-AREA_GEO_1997, Diff9784=AREA_GEO_1997-AREA_GEO_1984, 
+         relDiff1684=Diff1684/AREA_GEO_1984, relDiff1607=Diff1607/AREA_GEO_2007, relDiff0797=Diff0797/AREA_GEO_1997, relDiff9784=Diff9784/AREA_GEO_1984,
+         Ediff1684 = sqrt((Err30_2016^2)+(Err30_1984^2)))
+
+GLOFs@data <- GLOFs@data %>% left_join(eventsbylake, by = "LakeID")
+
+areaByYear <- areaByYear %>%
+  mutate(P1984 = if_else(AREA_GEO_1984 > 0, 1, 0, 0), P1997 = if_else(AREA_GEO_1997 > 0, 1, 0, 0), P2007 = if_else(AREA_GEO_2007 > 0, 1, 0, 0), P2016 = if_else(AREA_GEO_2016 > 0, 1, 0, 0))
+
+areaByYear <- areaByYear %>%
+  mutate(stability = with(areaByYear, if_else(P1984 == 1 & P1997 == 1 & P2007 == 1 & P2016 == 1, "Persistent", 
+                                      if_else(P1984 == 0 & P1997 == 1 & P2007 == 1 & P2016 == 1,"Appears", 
+                                      if_else(P1984 == 0 & P1997 == 0 & P2007 == 1 & P2016 == 1,"Appears", 
+                                      if_else(P1984 == 0 & P1997 == 0 & P2007 == 0 & P2016 == 1,"Appears",  
+                                      if_else(P1984 == 1 & P1997 == 1 & P2007 == 1 & P2016 == 0, "Disappears", 
+                                      if_else(P1984 == 1 & P1997 == 1 & P2007 == 0 & P2016 == 0, "Disappears", 
+                                      if_else(P1984 == 1 & P1997 == 0 & P2007 == 0 & P2016 == 0, "Disappears", 
+                                      if_else(P1984 == 0 & P1997 == 1 & P2007 == 0 & P2016 == 0, "AppearsDisappears",
+                                      if_else(P1984 == 0 & P1997 == 0 & P2007 == 1 & P2016 == 0, "AppearsDisappears", 
+                                      if_else(P1984 == 0 & P1997 == 1 & P2007 == 1 & P2016 == 0, "AppearsDisappears", 
+                                      if_else(P1984 == 0 & P1997 == 1 & P2007 == 0 & P2016 == 1, "DisappearsAppears",
+                                      if_else(P1984 == 1 & P1997 == 0 & P2007 == 0 & P2016 == 1, "DisappearsAppears",
+                                      if_else(P1984 == 1 & P1997 == 1 & P2007 == 0 & P2016 == 1, "DisappearsAppears",
+                                      if_else(P1984 == 1 & P1997 == 0 & P2007 == 1 & P2016 == 1, "DisappearsAppears", "NS"        ))))))))))))))))
+
+areaByYear <- areaByYear %>%
+  mutate(maxLakediff = if_else(P1984 == 1 & P2016 == 1, AREA_GEO_2016-AREA_GEO_1984, 
+                       if_else(P1984 == 0 & P1997 == 1 & P2016 == 1, AREA_GEO_2016-AREA_GEO_1997,
+                       if_else(P1984 == 0 & P1997 == 0 & P2007 == 1 & P2016 == 1, AREA_GEO_2016-AREA_GEO_2007,
+                       if_else(P1984 == 0 & P1997 == 0 & P2007 == 0 & P2016 == 1, AREA_GEO_2016,
+                       if_else(P1997 == 1 & P2007 == 0 & P2016 == 0, 0-AREA_GEO_1997, 
+                       if_else(P2007 == 1 & P2016 == 0, 0-AREA_GEO_2007,
+                       if_else(P1984 == 1 & P1997 == 0 & P2007 == 0 & P2016 == 0, 0-AREA_GEO_1984,0))))))))
+
+areaByYear <- areaByYear %>%
+  mutate(maxLakedifferr30 = if_else(P1984 == 1 & P2016 == 1, sqrt((Err30_2016^2)+(Err30_1984^2)), 
+                       if_else(P1984 == 0 & P1997 == 1 & P2016 == 1, sqrt((Err30_2016^2)+(Err30_1997^2)),
+                       if_else(P1984 == 0 & P1997 == 0 & P2007 == 1 & P2016 == 1, sqrt((Err30_2016^2)+(Err30_2007^2)),
+                       if_else(P1984 == 0 & P1997 == 0 & P2007 == 0 & P2016 == 1, Err30_2016, 0))))) 
+
+lakesshp@data <- lakesshp@data %>%
+  left_join(distinct(select(areaByYear, c("LakeID","stability", "maxLakediff", "maxLakedifferr30")), LakeID, .keep_all=TRUE), by=c("LakeID"))
+
+lakespts@data <- lakespts@data %>%
+  left_join(distinct(select(areaByYear, c("LakeID","stability", "Dam_Type", "maxLakediff", "maxLakedifferr30", "Connection", "Name")), LakeID, .keep_all=TRUE), by=c("LakeID")) 
+     
+factpal <- colorFactor(palette ="Reds", lakesshp$YearMid)
+bins <- c(-Inf, -100, -50, -20, -10, 0, 10, 20, 50, 100, Inf)
+binsAbs <- c(-25, -10, -5, -2, -0.5, 0.5, 2, 5, 10, 25, Inf)
+binsRel <- c(-10, -5, -2, -0.5, 0, 0.5, 2, 5, 10, Inf)
+binSize <- c(0, 10, 20, 50, 100, 200, Inf)
+binGLOF <- c(0,10, 20, 30)
+#palPerDiff <- colorBin("RdYlGn", domain = lakespts$PercentDif, bins = bins)
+palAbsDiff <- colorBin("RdYlGn", domain = lakespts$maxLakediff, bins = binsAbs)
+#palRelDiff <- colorBin("RdYlGn", domain = lakespts$RelLakeDif, bins = binsRel)
+palGLOF <- colorNumeric("red.pal", domain = GLOFs$TotalEvent, reverse = TRUE)
+palGLOF2 <- colorNumeric(c("lightblue", "blue", "darkred"), domain = GLOFs$TotalEvent)
+#palGLOF2 <- scale_colour_gradient2(low = "lightblue", mid = "blue", high = "red")
+
+  getColor <- function(lakespts) {
+    sapply(lakespts$Dam_Type, function(Dam_Type) {
+      if(Dam_Type == "moraine") {
+        "green"
+      } else if(Dam_Type == "bedrock") {
+        "orange"
+      } else if(Dam_Type == "ice") {
+        "blue"
+      } else if(Dam_Type == "debris") {
+        "purple"
+      } else {
+        "red"
+      } })
+  }
+
+  areas <- lakesshp$AREA_GEO
+  lakesshp@data$maxLakediff <- as.numeric(lakesshp@data$maxLakediff)
+ 
+  
+  #paldam <- getColor(lakespts)
+  dampal <- colorFactor(c("#87C098","#42A4C0","#CC7284", "#8777AC"), lakespts$Dam_Type)
+  paldamfact <- colorFactor(c("darkgreen", "deepskyblue", "red4", "purple" ), lakespts$Dam_Type)
+  palstab <- colorFactor(c("seagreen4", "red2", "red4", "seagreen2", "skyblue"), lakespts$stability)
+  stablabels <- c("Appear", "AppearDisappear", "Disappear", "DisappearAppear", "Persistent")
+  #perdiflabels <- formattable(percent(lakespts$PercentDif)/100, digits=2, format = "f")
+  absdiflabels <- formattable(lakespts$maxLakediff, digits=2, format = "f")
+  absdiferr <- formattable(lakespts$maxLakedifferr30, digits=2, format = "f")
+  #reldiflabels <- formattable(lakespts$RelLakeDif, digits=2, format = "f")
+  arealab <- formattable(areas, digits=2, format = "f")
+  errlab <- formattable(lakesshp$Err30, digits=2, format = "f")
+  changelab <- formattable(lakesshp$maxLakediff, digits=2, format = "f")
+  errDifflab <- formattable(as.numeric(lakesshp$maxLakedifferr30), digits=2, format = "f")
+  GLOFarea <- formattable(GLOFs$Area.x, digits=2, format = "f")
+  
+  getStabColor <- function(lakespts) {
+    sapply(lakespts$StabClass, function(StabClass) {
+      if(StabClass == "A") {
+        "green"
+      } else if(StabClass == "D") {
+        "red"
+      } else if(StabClass == "S") {
+        "blue"
+      } else {
+        "orange"
+      } })
+  }
+   
+labelsOutlines <- sprintf(
+  "<strong>%s</strong><br/><strong>Time Period: </strong>%s-%s<br/><strong>Area: </strong>%s <span>&#177;</span> %s km<sup>2</sup>
+  <br/><strong>Glacier: </strong>%s<br/><strong>Dam Type: </strong>%s<br/><strong>Lake Position: </strong>%s<br/><strong>Total area change: </strong>%s <span>&#177;</span> %s km<sup>2</sup><br/>",
+  lakesshp$LakeID, lakesshp$YearStart, lakesshp$YearEnd, arealab, errlab, lakesshp$Name, str_to_title(lakesshp$Dam_Type), str_to_title(lakesshp$Connection), changelab, errDifflab
+) %>% lapply(htmltools::HTML)
+
+labelsAbsdiff <- sprintf(
+  "<strong>%s</strong><br/><strong>Total area change: </strong>%s <span>&#177;</span> %s km<sup>2</sup><br/><strong>Dam Type: </strong>%s<br/><strong>Lake position: </strong>%s<br/><strong>Stability: </strong>%s <br/><strong>Glacier: </strong>%s<br/>",
+  lakespts$LakeID, absdiflabels, absdiferr, str_to_title(lakespts$Dam_Type), str_to_title(lakespts$Connection), lakespts$stability, lakespts$Name
+) %>% lapply(htmltools::HTML)
+
+labelsGLOF <- sprintf(
+  "<strong>%s</strong><br/><strong>Max Area: </strong>%s km<sup>2</sup><br/><strong>Dam Type: </strong>%s<br/><strong>Lake location: </strong>%s<br/><strong>Total drainage events: </strong>%s <br/>",
+  GLOFs$LakeID, GLOFarea, str_to_title(GLOFs$LAST_Dam_T), str_to_title(GLOFs$LAST_Locat.x), GLOFs$nEvents
+) %>% lapply(htmltools::HTML)
+
+
+labelsO2reg <- sprintf(
+  "<strong>Region: </strong>%s<br/><strong>Total glacier area: </strong>%s km<sup>2</sup>
+  <br/><strong>Total lake area: </strong>%s km<sup>2</sup><br/><strong>Percent debris cover: </strong>%s<span>&#37;</span><br/><strong>Number of lakes: </strong>%s<br/>",
+  O2Regions$FULL_NAME, prettyNum(O2Regions$TotalGlacArea, big.mark=",", scientific = FALSE), O2Regions$TotalLakeArea, O2Regions$PercDebCover, O2Regions$Nlakes
+) %>% lapply(htmltools::HTML)
+
+PMtimeStart <- 1960
+PMtimeEnd <- 1970
+PMsource <- "Post and Mayo (1971)"
+PMarea <- formattable(PM1971$Area, digits=2, format = "f")
+
+labelsPM <- sprintf(
+  "<strong>Time Period: </strong>%s-%s<br/><strong>Lake area: </strong>%s km<sup>2</sup><br/><strong>Source: </strong>%s<br/>",
+  PMtimeStart, PMtimeEnd, PMarea, PMsource
+) %>% lapply(htmltools::HTML)
+
+tag.map.title <- tags$style(HTML("
+  .leaflet-control.map-title {
+    transform: translate(-50%,20%);
+    position: fixed !important;
+    left: 50%;
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    background: rgba(255,255,255,0.75);
+    font-weight: bold;
+    font-size: 24px;
+  }
+"))
+
+title <- tags$div(
+  tag.map.title, HTML("Alaska's Ice-marginal Lakes")
+)
+```
+
+
+
+```{r AKmap, include=FALSE}
+timelabels <- c("1984-1988", "1997-2001", "2007-2011", "2016-2019")
+damlabels <- c("Bedrock", "Ice", "Moraine", "Supraglacial")
+stablabels <- c("Forms after 1984-1988", "Forms then drains", "Drains before 2016-2019", "Drains then reappears", "Present in all time periods")
+gloflabels <- c("0", "10", "20", "30")
+
+GLOFs$TotalEvent <- as.numeric(GLOFs$TotalEvent)
+
+AKmap <- leaflet(lakesshp) %>%
+  addProviderTiles('Esri.WorldStreetMap', group='Streets') %>%
+  addProviderTiles('Esri.WorldImagery',group='Imagery', options = providerTileOptions(opacity = 0.9)) %>%
+  addLayersControl(baseGroups=c('Imagery','Streets'),
+                   options = layersControlOptions(collapsed = F, autoZIndex =
+                                                    T)) %>% 
+  setView(lat=59.1713, lng= -140.8743,zoom=5)%>%
+  addControl(title, position = "topleft", className="map-title") %>% 
+  addPolygons(color = ~factpal(YearMid),weight = 1, smoothFactor = 0.2,
+              opacity = 1, fillOpacity = 0.1,
+              group = "Ice-marginal lake inventory",
+              popup=lakesshp$AREA_GEO,
+              label= labelsOutlines, 
+              highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                                 bringToFront = FALSE))%>%
+  addPolylines(data= O2Regions, weight = 2, smoothFactor = 0.2,
+              opacity = 1, fillOpacity = 0.1,
+              group = "Glacier Subregions",
+              label= labelsO2reg, 
+              highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE)) %>%
+  addPolygons(data= PM1971, color = "blue", weight = 1, smoothFactor = 0.2,
+              opacity = 1, fillOpacity = 0.1,
+              group = "Ice-dammed lakes in 1971",
+              popup=PM1971$Area,
+              label= labelsPM, 
+              highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                                 bringToFront = FALSE))%>%                 
+  addCircleMarkers(data=lakespts,
+                   color = ~palAbsDiff((lakespts$maxLakediff)), weight =1, fillOpacity = 0.7,
+                   #popup=lakespts$PercentDif,
+                   #color = "white", weight = 1,
+                   group ="Total Area Change",
+                   label= labelsAbsdiff,
+                   radius=~abs(lakespts$maxLakediff))%>% 
+  addCircleMarkers(data=GLOFs,
+                   color = ~palGLOF2((GLOFs$nEvents)), 
+                   weight =1, fillOpacity = 0.8,
+                   popup=GLOFs$nEvents,
+                   #color = "white", weight = 1,
+                   group ="Lake drainage inventory",
+                   label= labelsGLOF,
+                   radius=~abs(GLOFs$nEvents))%>% 
+  addCircleMarkers(data=lakespts,
+                   color = dampal(lakespts$Dam_Type), weight =1, fillOpacity = 0.9,
+                   group ="Dam Type",
+                   label= labelsAbsdiff,
+                   radius=3)%>%
+  addCircleMarkers(data=lakespts,
+                   color = palstab(lakespts$stability), weight =1, fillOpacity = 0.7,
+                   #popup=lakespts$PercentDif,
+                   #color = "white", weight = 1,
+                   group ="Lake Stability",
+                   label= labelsAbsdiff,
+                   radius=~ifelse(lakespts$stability == "S", 2, 3))%>%
+  addLegend(pal = palGLOF2, values= ~GLOFs$TotalEvent, opacity = 0.8, position = "bottomleft",
+            title = "Drainage Events", 
+            labFormat = function(type, cuts, p) {  # Here's the trick
+                                                  paste0(gloflabels)
+                             }) %>%
+  addLegend(pal = factpal, values= ~lakesshp$YearMid, opacity = 0.8, position = "bottomleft",
+            title = "Time Period", 
+            labFormat = function(type, cuts, p) {  # Here's the trick
+                                                  paste0(timelabels)
+                             }) %>%#labels = c("1984-1988", "1997-2001", "2007-2011", "2016-2019"))%>%
+  addLegend(pal = dampal, values = ~lakespts$Dam_Type, opacity = 0.8, position = "bottomleft",
+            title = "Dam Type",
+            labFormat = function(type, cuts, p) {  # Here's the trick
+                                                  paste0(damlabels)
+                             }) %>%
+  addLegend(pal = palstab, values = lakespts$stability, opacity = 0.8, position = "bottomright",
+            title = "Lake Stability", labFormat = function(type, cuts, p) {  # Here's the trick
+                                                  paste0(stablabels)
+                             }) %>%
+  addLayersControl(baseGroups=c('Streets','Imagery'),
+                   overlayGroups=c('Glacier Subregions', 'Ice-marginal lake inventory', 'Lake drainage inventory', 'Dam Type', 'Lake Stability', 'Total Area Change', 'Ice-dammed lakes in 1971' ),
+                   options = layersControlOptions(collapsed = F, autoZIndex =T)) %>%
+  hideGroup(c('Total Area Change','Relative Difference', 'Dam Type', 'Lake Stability', 'Ice-dammed lakes in 1971', 'Lake drainage inventory'))
+  
+```
+
+```{r mapOut, out.width = '100%', echo=FALSE}
+AKmap
+```

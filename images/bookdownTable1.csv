@@ -1,0 +1,5 @@
+Time interval,Dataset,Sensor,Resolution,No. of images used
+1984–1988,Landsat 5,ETM,30 m,683
+1997–2001,Landsat 5 & 7,ETM/ETM+,30 m,1312
+2007–2011,Landsat 5 & 7,ETM/ETM+,30 m,2630
+2016–2019,Landsat 8,OLI,30 m,1754
