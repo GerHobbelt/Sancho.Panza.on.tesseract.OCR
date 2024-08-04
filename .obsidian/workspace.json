@@ -13,14 +13,28 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_bookdown.yml",
+                "file": "06-references.Rmd",
+                "mode": "source",
+                "backlinks": true,
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "49322c6bea472e6e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "07-scratch.md",
                 "mode": "source",
                 "backlinks": true,
                 "source": false
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -86,7 +100,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "_bookdown.yml",
+                "file": "07-scratch.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +117,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "_bookdown.yml",
+                "file": "07-scratch.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -126,7 +140,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "_bookdown.yml"
+                "file": "07-scratch.md"
               }
             }
           },
@@ -166,19 +180,20 @@
       "workspaces:Manage workspace layouts": false
     }
   },
-  "active": "35e13ccfbbf4fc4e",
+  "active": "49322c6bea472e6e",
   "lastOpenFiles": [
-    "01-intro.Rmd",
-    "README.md",
     "06-references.Rmd",
+    "07-scratch.md",
     "05-summary.Rmd",
-    "04-application.Rmd",
-    "03-method.Rmd",
+    "01-intro.Rmd",
     "02-literature.Rmd",
+    "03-method.Rmd",
+    "04-application.Rmd",
+    "_bookdown.yml",
+    "README.md",
     "!zips/cheng1985/05-PC_model.Rmd",
     "toc.css",
     "style.css",
-    "preamble.tex",
     "Aside/Testing - nasty filenames - also on UNIX.md",
     "Aside/How to get the page images for google books.md",
     "Aside/Testing - retry connections after a while as user may be running application firewall.md",
@@ -202,7 +217,6 @@
     "Technology/Odds 'n' Ends/libglob - does not fare well when traversing non-Unicode-legal filenames.md",
     "Technology/Odds 'n' Ends/Unicode - useful arrows.md",
     "Technology/Odds 'n' Ends/Linux - hitting Ctrl-C on a mv or cp command can leave a partial,b0rked destination file.md",
-    "Technology/Odds 'n' Ends/File copy oddities observed elsewhere - stuff to be reckoned with.md",
     "Progress in Development/Testing & Evaluating/Collected RAW logbook notes - PDF bulktest + mutool_ex PDF + URL tests/Pasted image 20240227174308.png",
     "assets/tesseract-workflow-diagram.svg",
     "Progress in Development/Considering the Way Forward/assets/wavedrom16.png",
