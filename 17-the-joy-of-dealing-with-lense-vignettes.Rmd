@@ -1,0 +1,6 @@
+this is more than just a dark shade at the ouetcrim. it also impacts contrast at the outer rim and when you are a little less lucky, image sharpness, astigmatism and other lense defects will produce increasingly pronounced randomness in the pixel signal at the outer rim.
+
+plenty hard to deal with, reckon with a customized compensation approach.
+
+can we detect this sort if thing?
+
