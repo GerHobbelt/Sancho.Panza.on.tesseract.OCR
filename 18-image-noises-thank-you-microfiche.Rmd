@@ -1,0 +1,7 @@
+spats and scratches galore in microfiche digitized image data.
+
+as a lot if this stuff was digitized (and originals destroyed or deteriorated further due to physical aging, so this is it!) back in the day when a gigabyte was a highly theoretical concept with no presence in our physical reality, these fiche scans are often monochtomatic, ie pure black and white, to help reduce digital storage costs. jbig2 and other binary pixel data compressing algorithms may show up at your doorstep and woe betide the sad sack who has to deal with fiche scans where this regrettably premature thresholding process  delivers to you a partially damaged or even obliterated page scan. resolution may not be an issue, or only a minor one, Vis a vus these damages in your fiche source images.
+
+good luck and god speed in your quest to attain decent ice result, sailor!
+
+
