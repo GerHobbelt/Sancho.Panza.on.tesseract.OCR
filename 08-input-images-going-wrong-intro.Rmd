@@ -1,0 +1,18 @@
+when you scour the internet you find a lot of Happy People presenting Happy Results using tesseract and other OCR packages. oh, isn't it all great and gorgeous!
+
+me I'm rather more of the Stattler and Waldorf persuasion, someone who strongly believes that the world does not exist in the form of Happy Trees and cute Little Mountains where the sun always shines on the afro of Bob Ross. really those are just studio lights; I don't know about you but sometimes I feel we're being had, while a lot of shite is  going down all around, nothing works as it should in our best unmedicated fantasies and you will have a hard time getting it right using any sort of OCR approach. first and foremost the trouble starts with your input images scanned from pages, photographed from anywhere. it doesn't matter, it always goes wrong when you least expect it and are pressed for results. 
+
+because we don't have sufficient time in our life to discover and recover from every mistake by ourselves it's much faster to discover the mistakes made by others and learn from them so that we at least have an opportunity to make different mistakes. in RL society, that's what gossip is good for. mistakes are what this book is all about  -- and hopefully learning from them before we get bitten by them ourselves.
+
+
+I don't claim to be your ultimate Zen master, level nine Buddhist or any kind of Guru who will tell you what to do with unfaltering narcistic certitude when the shite hits the fan while we look at the troubles and the faults that result in the next sections. however, where possible, we will try, together or alone, to find the way out of every cesspit that we stumble into while we travel on our path through these pages filled with examples of OCR attempts that didn't give us roses but threw up a lot of thorns instead.
+
+
+there's a lot of ways an image can incorporate include aspects which are detrimental to OCR output quality / recognition. this section will showcase many, both simple and complex cases, where a simple naive tesseract run will deliver all but gobbledygook.
+while the collection is not exhaustive, heck, y'all talented folks surely have ways to produce more bothersome inputs, but we'll try to address a wide spread of these buggers.
+
+without further ado, let's jump in, immortality awaits!
+
+
+
+
