@@ -1,0 +1,17 @@
+is it any use?
+
+tesseract has a built-(in limitation on the maximum image width &height: the T dimension type is int16_t and the maximum width and height are specified as 32767 pixels wide.
+
+of course, such extremely large images do take a lot if time, so it might be beneficial to reduce these in size before feeding them to the OCR engine: whole there does exist a patch for tesseract to accept higher dimension imagery, I did ultimately not enable that patch in my repo as the image processing cost is ludicrously high.
+
+# thought: how does same content yet different image size impact tesseract performance? some O() expression perhaps, or a chart plotting the increasing cost: is this linear or squared per image dimension factor?
+
+when downscaling images, the question arrises which algo works best for ice: while some people may like lanczis et al for human perceptually good downscales (how do those single pixel lines and curves come out, though?), one can seriously wonder whether that sort if approach is best for OCR .
+
+might it not, perhaps, be best to use a custom diwnscaler that keeps the thin lines in the foreground ie the text on the page intact as best as possible, say a max filter over nearest neighbour. think bodoni title font and then downscaling that to xheight 30px 
+
+
+
+which brings us to the added relevance if this downscaling question: when tesseract were able to segment detect dropcaps or title lines, those must be downscales for they won't otherwise fit the 50px vertical scanline nature vector size if the LSTM engine, so even for smaller input images, when you have dropcaps and I've title lines it other relatively large text lines (presentation sheet scans, f.e.?) tesseract will do some downscaling of its own for these parts of the image, after it's done segmenting.
+
+
