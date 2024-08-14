@@ -19,22 +19,8 @@
                 "source": false
               }
             }
-          },
-          {
-            "id": "49322c6bea472e6e",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "07-scratch.md",
-                "mode": "source",
-                "backlinks": true,
-                "source": false
-              }
-            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -100,7 +86,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "07-scratch.md",
+                "file": "06-references.Rmd",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -117,7 +103,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "07-scratch.md",
+                "file": "06-references.Rmd",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -140,7 +126,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "07-scratch.md"
+                "file": "06-references.Rmd"
               }
             }
           },
@@ -180,8 +166,10 @@
       "workspaces:Manage workspace layouts": false
     }
   },
-  "active": "49322c6bea472e6e",
+  "active": "35e13ccfbbf4fc4e",
   "lastOpenFiles": [
+    "07-scratch.md",
+    "07-scratch.Rmd",
     "assets/folha large-magazine-spread smaller.png",
     "assets/folha spread brave.png~",
     "assets/folha large-magazine-spread.kra~",
@@ -199,11 +187,8 @@
     "assets/Empty Raw Page.jpg",
     "assets/folha jpeg artifact zoom 1B.webp",
     "assets/folha jpeg artifact zoom 0.kra",
-    "assets/folha jpeg artifact zoom 0.jpg",
     "assets/folha jpeg artifact zoom 2.kra",
     "assets/folha jpeg artifact zoom.kra",
-    "assets/silhouette-cameo-snijmat-12-inch-305-x-305-cm.kra~",
-    "07-scratch.md",
     "README.md",
     "Aside/Testing - nasty filenames - also on UNIX.md",
     "Aside/How to get the page images for google books.md",
