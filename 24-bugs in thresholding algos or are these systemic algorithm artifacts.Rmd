@@ -1,0 +1,9 @@
+take the fonts newsgroup image (red background) that caused so much weirdness when pulled through leotonica adaptive global threshold code and my struggle with that bit of code to get it (nearly!) right.
+
+discuss threshold /binarization algos when faced with jpeg artifacts or other subliminal noises which happen to thriw iff the algo for particular image X.
+
+can we find images that do this on purpose?
+
+showcase the total weirdness coming out if the tesseract nlbin implementation: that can't be right?!
+
+working sauvola with the kvk page, perhaps?
