@@ -1,0 +1,10 @@
+another source if image noise, even when you *technically* argued there aunt any this scan around, is dye to the physical nature of both printing press technology, inks and paper used.
+
+bleed through can introduce a phantom text lurking in the background that will be picked up, at least partially, everywhere it shines through the segmented-out text line currently under scrutiny:
+thin paper will result in more obvious bleed through, which negatively impacts OCR quality.
+
+deep ink penetration into the paper page can be even more detrimental as this often shows up as near random soeckles and glitches if pure black while also having the classic bleed through shine of text printed on the reverse side of the paper elsewhere in your text line image segment.
+
+classical punch printing presses (anything non offset /laser printed really) do not just leave ink on a page but also physically reshape the oage: every glyph is a depression, if ever do slightly, or at least local compression of the page fiber structure, which can be easily become visible when photographing pages, particularly when done at an angle 
+shadows result for both this side (depression) and Reverso (raised bump as the press pushed the paper *up* when considered from this side. all if which has since impact in the page image/scan and thus impacts our ice efforts.
+
