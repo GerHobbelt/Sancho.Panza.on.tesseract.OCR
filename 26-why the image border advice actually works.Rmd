@@ -1,0 +1,11 @@
+because tesseract rescales segmented text lines to turn them into feature vector sets and a "line" is not the same height as your actual text, particularly when your actual text happens to not include any glyphs with large descenders and ascdender stems (dgjpqbhk...)
+
+this might be a good place to see and discuss the causes for the 30px best result Vs 50px feature vector height: is there any additional magic or heuristics added by tesseract aling the way from libe segmentation to the gates if the OCR neural net, maybe for dealing with super and subscripts as we go along?
+incidentally, how do these fare when we have them in oage? dies tesseract run multiple rounds per textlune or what?
+how well dies LSTM fare when the text line segmentation didn't properly discover the text baseline ie what gives when the text image pixels have an undesirable vertical shift?
+
+what can we do about this?
+
+why do people report falling results when they add a lot of white border, which *theoretically* should not have any impact at all!  or does it sneakily influence the built in global threshold and segmentation stages to cause us these additional headaches?
+
+what gives, my man?!
