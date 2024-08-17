@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "06-references.Rmd",
+                "file": "08-input-images-going-wrong-intro.Rmd",
                 "mode": "source",
                 "backlinks": true,
                 "source": false
@@ -86,7 +86,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "06-references.Rmd",
+                "file": "08-input-images-going-wrong-intro.Rmd",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +103,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "06-references.Rmd",
+                "file": "08-input-images-going-wrong-intro.Rmd",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -126,7 +126,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "06-references.Rmd"
+                "file": "08-input-images-going-wrong-intro.Rmd"
               }
             }
           },
@@ -168,8 +168,9 @@
   },
   "active": "35e13ccfbbf4fc4e",
   "lastOpenFiles": [
-    "07-scratch.md",
     "07-scratch.Rmd",
+    "06-references.Rmd",
+    "07-scratch.md",
     "assets/folha large-magazine-spread smaller.png",
     "assets/folha spread brave.png~",
     "assets/folha large-magazine-spread.kra~",
