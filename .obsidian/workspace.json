@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "06-references.Rmd",
+                "file": "08-input-images-going-wrong-intro.Rmd",
                 "mode": "source",
                 "backlinks": true,
                 "source": false
@@ -86,7 +86,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "06-references.Rmd",
+                "file": "08-input-images-going-wrong-intro.Rmd",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +103,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "06-references.Rmd",
+                "file": "08-input-images-going-wrong-intro.Rmd",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -126,7 +126,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "06-references.Rmd"
+                "file": "08-input-images-going-wrong-intro.Rmd"
               }
             }
           },
@@ -166,29 +166,34 @@
       "workspaces:Manage workspace layouts": false
     }
   },
-  "active": "35e13ccfbbf4fc4e",
+  "active": "e789328758fc1ad5",
   "lastOpenFiles": [
+    "book7/toolbox.qmd",
+    "book7/todo.numbers",
+    "book7/themes.qmd",
+    "book7/style.css",
+    "book7/statistical-summaries.qmd",
+    "book7/start.qmd",
+    "book7/springer/proposal-3e.md",
+    "book7/springer/marketing-ggplot2.txt",
+    "book7/springer/contract-3.pdf",
+    "book7/springer/contract-1.pdf",
+    "book7/springer/contract-2.pdf",
+    "book7/springer/contract-1-amendment.pdf",
+    "book7/ggplot2-review/forrence.md",
+    "book7/diagrams/vector-raster.png",
+    "book7/diagrams/scale-guides.png",
+    "book7/diagrams/position-facets.png",
+    "book7/diagrams/mastery-schema.png",
+    "book7/diagrams/hcl-space.png",
+    "book7/diagrams/diamond-dimensions.png",
+    "book7/diagrams/colour-wheel.png",
+    "book7/cover.jpg",
+    "book7/contributing.md",
+    "book7/README.md",
     "07-scratch.md",
-    "07-scratch.Rmd",
     "assets/folha large-magazine-spread smaller.png",
-    "assets/folha spread brave.png~",
-    "assets/folha large-magazine-spread.kra~",
-    "assets/folha large-magazine-spread.kra-autosave.kra",
     "assets/folha large-magazine-spread.png",
-    "assets/folha large-magazine-spread.kra",
-    "assets/folha jpeg artifact zoom 3B.webp",
-    "assets/folha jpeg artifact zoom 3A.webp",
-    "assets/folha jpeg artifact zoom 2B.jpg",
-    "assets/folha jpeg artifact zoom 3.webp",
-    "assets/folha jpeg artifact zoom 2.jpg",
-    "assets/folha jpeg artifact zoom 1.kra",
-    "assets/mekur-source.png",
-    "assets/grid.kra",
-    "assets/Empty Raw Page.jpg",
-    "assets/folha jpeg artifact zoom 1B.webp",
-    "assets/folha jpeg artifact zoom 0.kra",
-    "assets/folha jpeg artifact zoom 2.kra",
-    "assets/folha jpeg artifact zoom.kra",
     "README.md",
     "Aside/Testing - nasty filenames - also on UNIX.md",
     "Aside/How to get the page images for google books.md",
@@ -208,10 +213,6 @@
     "Technology/Odds 'n' Ends/PDFs in the Wild/Testing - Nasty URLs for PDFs.md",
     "Aside/Creating git patches from repo commits.md",
     "Aside/C++ std.unique_ptr for array type auto-delete.md",
-    "Progress in Development/UI Development Notes/tesseract (web) UI/Testing web-based editors for REPL-style tesseract runs.md",
-    "How to build Qiqqa from source.md",
-    "Technology/Odds 'n' Ends/libglob - does not fare well when traversing non-Unicode-legal filenames.md",
-    "Technology/Odds 'n' Ends/Unicode - useful arrows.md",
-    "Technology/Odds 'n' Ends/Linux - hitting Ctrl-C on a mv or cp command can leave a partial,b0rked destination file.md"
+    "Progress in Development/UI Development Notes/tesseract (web) UI/Testing web-based editors for REPL-style tesseract runs.md"
   ]
 }
