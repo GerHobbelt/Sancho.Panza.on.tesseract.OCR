@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "08-input-images-going-wrong-intro.Rmd",
+                "file": "README.md",
                 "mode": "source",
                 "backlinks": true,
                 "source": false
@@ -86,7 +86,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "08-input-images-going-wrong-intro.Rmd",
+                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +103,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "08-input-images-going-wrong-intro.Rmd",
+                "file": "README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -126,7 +126,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "08-input-images-going-wrong-intro.Rmd"
+                "file": "README.md"
               }
             }
           },
@@ -168,28 +168,32 @@
   },
   "active": "35e13ccfbbf4fc4e",
   "lastOpenFiles": [
-    "07-scratch.Rmd",
+    "preamble.tex",
+    "_bookdown.yml",
+    "_output.yml",
+    "01-intro.Rmd",
+    "02-literature.Rmd",
+    "03-method.Rmd",
+    "04-application.Rmd",
+    "05-summary.Rmd",
     "06-references.Rmd",
+    "07-scratch.Rmd",
+    "08-input-images-going-wrong-intro.Rmd",
+    "quarto-gallery/presentations/revealjs/image/process_old.png",
+    "quarto-gallery/presentations/revealjs/image/process_new.png",
+    "quarto-gallery/presentations/revealjs/image/modularity_2.png",
+    "quarto-gallery/presentations/revealjs/image/modularity_1.png",
+    "quarto-gallery/presentations/revealjs/image/interface.gif",
+    "quarto-gallery/presentations/revealjs/image/il_seal.gif",
+    "quarto-gallery/presentations/revealjs/image/icjia.png",
+    "quarto-gallery/presentations/revealjs/image/gif_9.png",
+    "quarto-gallery/presentations/revealjs/image/gif_8.png",
+    "quarto-gallery/presentations/revealjs/image/gif_7.png",
+    "book7/springer/proposal-3e.md",
+    "book7/ggplot2-review/forrence.md",
+    "book7/contributing.md",
+    "book7/README.md",
     "07-scratch.md",
-    "assets/folha large-magazine-spread smaller.png",
-    "assets/folha spread brave.png~",
-    "assets/folha large-magazine-spread.kra~",
-    "assets/folha large-magazine-spread.kra-autosave.kra",
-    "assets/folha large-magazine-spread.png",
-    "assets/folha large-magazine-spread.kra",
-    "assets/folha jpeg artifact zoom 3B.webp",
-    "assets/folha jpeg artifact zoom 3A.webp",
-    "assets/folha jpeg artifact zoom 2B.jpg",
-    "assets/folha jpeg artifact zoom 3.webp",
-    "assets/folha jpeg artifact zoom 2.jpg",
-    "assets/folha jpeg artifact zoom 1.kra",
-    "assets/mekur-source.png",
-    "assets/grid.kra",
-    "assets/Empty Raw Page.jpg",
-    "assets/folha jpeg artifact zoom 1B.webp",
-    "assets/folha jpeg artifact zoom 0.kra",
-    "assets/folha jpeg artifact zoom 2.kra",
-    "assets/folha jpeg artifact zoom.kra",
     "README.md",
     "Aside/Testing - nasty filenames - also on UNIX.md",
     "Aside/How to get the page images for google books.md",
@@ -209,10 +213,6 @@
     "Technology/Odds 'n' Ends/PDFs in the Wild/Testing - Nasty URLs for PDFs.md",
     "Aside/Creating git patches from repo commits.md",
     "Aside/C++ std.unique_ptr for array type auto-delete.md",
-    "Progress in Development/UI Development Notes/tesseract (web) UI/Testing web-based editors for REPL-style tesseract runs.md",
-    "How to build Qiqqa from source.md",
-    "Technology/Odds 'n' Ends/libglob - does not fare well when traversing non-Unicode-legal filenames.md",
-    "Technology/Odds 'n' Ends/Unicode - useful arrows.md",
-    "Technology/Odds 'n' Ends/Linux - hitting Ctrl-C on a mv or cp command can leave a partial,b0rked destination file.md"
+    "Progress in Development/UI Development Notes/tesseract (web) UI/Testing web-based editors for REPL-style tesseract runs.md"
   ]
 }

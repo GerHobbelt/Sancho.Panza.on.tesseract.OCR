@@ -1,4 +1,4 @@
-take the fonts newsgroup image (red background) that caused so much weirdness when pulled through leotonica adaptive global threshold code and my struggle with that bit of code to get it (nearly!) right.
+take the fonts newsgroup image (red background) that caused so much weirdness when pulled through leptonica adaptive global threshold code and my struggle with that bit of code to get it (nearly!) right.
 
 discuss threshold /binarization algos when faced with jpeg artifacts or other subliminal noises which happen to thriw iff the algo for particular image X.
 
