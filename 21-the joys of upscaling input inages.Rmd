@@ -1,6 +1,6 @@
-what ti do when your text's xheight is below the tesseract optimum?
+what to do when your text's xheight is below the tesseract optimum?
 
-should we leave that for tesseract to handle? but then what would we get, both in the segmentation and OCR stages, assuming we are using a v4/v5 model (LSTM): what sort of upscaling choices does the tesseract hodebase make once it's extracted a single line/word of pixel image data to feed into the ice neural net?
+should we leave that for tesseract to handle? but then what would we get, both in the segmentation and OCR stages, assuming we are using a v4/v5 model (LSTM): what sort of upscaling choices does the tesseract codebase make once it's extracted a single line/word of pixel image data to feed into the ice neural net?
 
-when we do the upscaling in the preprocessing phase before we feed the result to tesseract to OCR, what algorithm works well? lanczis, bicubic, Gaussian,linear, ...?
+when we do the upscaling in the preprocessing phase before we feed the result to tesseract to OCR, what algorithm works well? Lanczos, bicubic, Gaussian, linear, ...?
 

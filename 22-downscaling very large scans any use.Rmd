@@ -6,9 +6,9 @@ of course, such extremely large images do take a lot if time, so it might be ben
 
 # thought: how does same content yet different image size impact tesseract performance? some O() expression perhaps, or a chart plotting the increasing cost: is this linear or squared per image dimension factor?
 
-when downscaling images, the question arrises which algo works best for ice: while some people may like lanczis et al for human perceptually good downscales (how do those single pixel lines and curves come out, though?), one can seriously wonder whether that sort if approach is best for OCR .
+when downscaling images, the question arises which algo works best for ice: while some people may like Lanczos et al for human perceptually good downscales (how do those single pixel lines and curves come out, though?), one can seriously wonder whether that sort if approach is best for OCR .
 
-might it not, perhaps, be best to use a custom diwnscaler that keeps the thin lines in the foreground ie the text on the page intact as best as possible, say a max filter over nearest neighbour. think bodoni title font and then downscaling that to xheight 30px 
+might it not, perhaps, be best to use a custom downscaler that keeps the thin lines in the foreground ie the text on the page intact as best as possible, say a max filter over nearest neighbour. think Bodoni title font and then downscaling that to xheight 30px 
 
 
 

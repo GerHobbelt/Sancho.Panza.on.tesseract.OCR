@@ -1,4 +1,4 @@
 mistis colofon page scan: special characters, segmentation breaking a "2" into two bboxes because the stem is locally too light to make it through the binarization stage as foreground pixel(s).
 
-can we correct / adjyst / enhance such source images?
+can we correct / adjust / enhance such source images?
 
