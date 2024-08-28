@@ -2,6 +2,8 @@ project:
   type: book
   output-dir: _book
 
+engine: knitr
+
 book:
   title: "R for Data Science (2e)"
   reader-mode: true
