@@ -18,3 +18,10 @@ StripTrailingWhitespace: Yes
 BuildType: Website
 
 QuitChildProcessesOnExit: Yes
+
+UseNativePipeOperator: Yes
+
+MarkdownWrap: Sentence
+MarkdownCanonical: Yes
+
+SpellingDictionary: en_US
