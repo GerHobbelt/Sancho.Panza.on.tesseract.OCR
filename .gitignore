@@ -2,7 +2,8 @@
 .Rproj.user
 .Rhistory
 .RData
-_book
 rsconnect
 
 /!zips/
+/tmp/
+
