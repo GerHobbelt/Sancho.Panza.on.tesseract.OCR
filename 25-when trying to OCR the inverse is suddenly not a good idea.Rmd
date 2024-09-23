@@ -1,5 +1,5 @@
 
-examples where it turns out tesseracts built in "let's try to OCR the inverse image when my local confidence drops below 70" is not the bright spark if inspiration it might otherwise turn out to be.
+examples where it turns out tesseracts built in "let's try to OCR the inverse image when my local confidence drops below 70" is not the bright spark of inspiration it might otherwise turn out to be.
 
 when Impact and other fat fonts are the foreground/background heuristics, ie when foreground happens to occupy more than 50% of the inspected area.
 

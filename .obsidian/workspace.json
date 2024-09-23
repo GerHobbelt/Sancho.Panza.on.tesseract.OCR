@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "README.md",
+                "file": "00-dedication.qmd",
                 "mode": "source",
                 "backlinks": true,
                 "source": false
@@ -86,7 +86,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "README.md",
+                "file": "00-dedication.qmd",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +103,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "README.md",
+                "file": "00-dedication.qmd",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": false
               }
@@ -126,7 +126,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "README.md"
+                "file": "00-dedication.qmd"
               }
             }
           },
@@ -168,12 +168,18 @@
   },
   "active": "35e13ccfbbf4fc4e",
   "lastOpenFiles": [
-    "_quarto.yml",
-    "_freeze/arrow/execute-results/html.json",
-    "_freeze/arrow/execute-results",
-    "_freeze/arrow",
-    "_freeze",
-    "r4ds.Rproj",
+    "01-intro.Rmd",
+    "README.md",
+    "preamble.tex",
+    "Makefile",
+    "LICENSE",
+    "index.Rmd",
+    "DESCRIPTION",
+    "27-special needs lower contrast scans and other headaches.Rmd",
+    "26-why the image border advice actually works.Rmd",
+    "25-when trying to OCR the inverse is suddenly not a good idea.Rmd",
+    "24-bugs in thresholding algos or are these systemic algorithm artifacts.Rmd",
+    "23-adversarial input image noise done by bleedthrough.Rmd",
     "r4ds-book/screenshots/View-3.png",
     "r4ds-book/screenshots/View-2.png",
     "r4ds-book/screenshots/View-1.png",
@@ -184,11 +190,6 @@
     "r4ds-book/screenshots/rstudio-palette.png",
     "r4ds-book/screenshots/rstudio-nav.png",
     "r4ds-book/screenshots/rstudio-diagnostic.png",
-    "r4ds-book/screenshots",
-    "r4ds-book/regexps.qmd",
-    "r4ds-book/rectangling.qmd",
-    "r4ds-book/r4ds.scss",
-    "r4ds-book/r4ds.Rproj",
     "r4ds-book/README.md",
     "r4ds-book/CODE_OF_CONDUCT.md",
     "ggplot2-book/springer/proposal-3e.md",
@@ -200,7 +201,6 @@
     "book7/contributing.md",
     "book7/README.md",
     "07-scratch.md",
-    "README.md",
     "Aside/Testing - nasty filenames - also on UNIX.md",
     "Aside/How to get the page images for google books.md",
     "Aside/Testing - retry connections after a while as user may be running application firewall.md",
