@@ -168,6 +168,7 @@
   },
   "active": "35e13ccfbbf4fc4e",
   "lastOpenFiles": [
+    "__git_lazy_remotes__",
     "01-intro.Rmd",
     "README.md",
     "preamble.tex",
@@ -179,7 +180,6 @@
     "26-why the image border advice actually works.Rmd",
     "25-when trying to OCR the inverse is suddenly not a good idea.Rmd",
     "24-bugs in thresholding algos or are these systemic algorithm artifacts.Rmd",
-    "23-adversarial input image noise done by bleedthrough.Rmd",
     "r4ds-book/screenshots/View-3.png",
     "r4ds-book/screenshots/View-2.png",
     "r4ds-book/screenshots/View-1.png",
