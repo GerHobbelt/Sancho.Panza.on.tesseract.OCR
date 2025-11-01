@@ -147,5 +147,11 @@ _Advice Number 2:_ when rendering page images, the ppi (pixels per inch) resolu
 
 ![diagram.png](https://groups.google.com/group/tesseract-ocr/attach/29504133fd94/diagram.png?part=0.0.1&view=1)  
 
-(diagram PikChr source + SVG attached)
+(diagram [PikChr](https://fossil-scm.org/home/doc/tip/www/pikchr.md) source + SVG attached)
+
+
+
+
+
+
 

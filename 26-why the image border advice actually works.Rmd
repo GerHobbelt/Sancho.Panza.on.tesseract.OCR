@@ -2,7 +2,7 @@ because tesseract rescales segmented text lines to turn them into feature vector
 
 this might be a good place to see and discuss the causes for the 30px best result Vs 50px feature vector height: is there any additional magic or heuristics added by tesseract along the way from line segmentation to the gates of the OCR neural net, maybe for dealing with super and subscripts as we go along?
 incidentally, how do these fare when we have them in page? dies tesseract run multiple rounds per textline or what?
-how well dies LSTM fare when the text line segmentation didn't properly discover the text baseline ie what gives when the text image pixels have an undesirable vertical shift?
+how well dies LSTM fare when the text line segmentation didn't properly discover the text baseline i.e. what gives when the text image pixels have an undesirable vertical shift?
 
 what can we do about this?
 
