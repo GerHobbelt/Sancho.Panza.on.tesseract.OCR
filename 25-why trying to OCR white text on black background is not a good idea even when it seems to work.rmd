@@ -1,0 +1,324 @@
+
+See also [[25-when trying to OCR the inverse is suddenly not a good idea.Rmd]].
+
+From the google mailing list: https://groups.google.com/d/msgid/tesseract-ocr/77ac0d2b-7796-4f17-8bc6-0e70a9653adan%40googlegroups.com?utm_medium=email&utm_source=footer
+
+
+I am trying to extract the date and time from 
+
+
+  ![[assets/time.png]]
+
+
+  
+
+I have successfully use tesseract to extract text from other images.  tesseract does not find any text in the above image, 
+
+ ```
+   michael@argon:~/michael/trunk/src/tides$ tesseract time.png out  
+   Estimating resolution as 142  
+  
+
+   michael@argon:~/michael/trunk/src/tides$ cat out.txt  
+  
+
+   michael@argon:~/michael/trunk/src/tides$ ls -l out.txt  
+   -rw-r----- 1 michael michael 0 Oct 30 08:58 out.txt  
+```
+
+  
+
+Any help you can give me would be appreciated.  I attached the time.png file I used above.
+
+
+
+
+
+
+
+--------------------
+--------------------
+--------------------
+--------------------
+
+
+
+
+I cannot emphasize this single item (in a long list of stuff one can/must do before feeding any image to an OCR engine) enough: **tesseract has been trained to 'read' books, i.e black text on white background. Consequently, any image preprocessing step(s) that get you there, are strongly advised.**
+
+  
+
+This, and lots of other "_I don't wanna hear this ![🥴](https://fonts.gstatic.com/s/e/notoemoji/16.0/1f974/72.png)_ " important details show up in the documents and emails listed below: 
+
+(I know people like twitter-sized or shorter text, but you've got some reading to do if you want to be successful at OCRing stuff. We all have to, it's not simple.)
+
+  
+
+**- [https://tesseract-ocr.github.io/tessdoc/ImproveQuality.html](https://tesseract-ocr.github.io/tessdoc/ImproveQuality.html) ![🎯](https://fonts.gstatic.com/s/e/notoemoji/16.0/1f3af/72.png)** 
+
+- [https://github.com/tesseract-ocr/tessdoc/blob/main/tess3/FAQ-Old.md#is-there-a-minimum--maximum-text-size-it-wont-read-screen-text](https://github.com/tesseract-ocr/tessdoc/blob/main/tess3/FAQ-Old.md#is-there-a-minimum--maximum-text-size-it-wont-read-screen-text)
+
+- [https://groups.google.com/g/tesseract-ocr/c/Wdh_JJwnw94/m/24JHDYQbBQAJ?pli=1](https://groups.google.com/g/tesseract-ocr/c/Wdh_JJwnw94/m/24JHDYQbBQAJ?pli=1)
+
+- [https://groups.google.com/g/tesseract-ocr/c/B2-EVXPLovQ/m/lP0zQVApAAAJ](https://groups.google.com/g/tesseract-ocr/c/B2-EVXPLovQ/m/lP0zQVApAAAJ)
+
+  
+
+and then a bunch of messages that are related; I'd rather not repeat myself, so please take your time and read those threads: some of it may sound crazy at first, but you're doing something that's touching on the edge of the original design goals and that means you're bound to meet some "weird behaviour" along the way. Before I let myself out, **the second most important piece of advice I can give everyone: use HOCR (which is HTML content plus coordinates) or TSV output instead of anything else; _do not_, I repeat: _!DO NOT!_ output txt format, just because every internet wizard out there does it in their blog: txt (text) format is _minimal-information_ and you are way better off with a _maximal-information_ output for when you need to diagnose trouble** -- plus, now you've seen the workflow diagram that's part of the info above, **turning HOCR/TSV into TXT should be part of your postprocessing**, AFAIAC.
+
+Other direct or sideways relevant blurbs to be read here (again, consider reading the entire threads; OCR is one of those activities where 'quickly scanning my text books to pass my exam' as you previously learned at school is not going to get you closer to success faster, on the contrary:
+
+  
+
+- [https://groups.google.com/g/tesseract-ocr/c/jWdpUF7mTxE](https://groups.google.com/g/tesseract-ocr/c/jWdpUF7mTxE)
+
+- [https://groups.google.com/g/tesseract-ocr/c/vrBc1FPeprQ/m/GxTlapF-BwAJ](https://groups.google.com/g/tesseract-ocr/c/vrBc1FPeprQ/m/GxTlapF-BwAJ)
+
+- [https://groups.google.com/g/tesseract-ocr/c/c_S7GG5njkw/m/OPQ6q5zBAQAJ](https://groups.google.com/g/tesseract-ocr/c/c_S7GG5njkw/m/OPQ6q5zBAQAJ)
+
+- [https://groups.google.com/g/tesseract-ocr/c/8BerjYWGGQU/m/KwSz7724AQAJ](https://groups.google.com/g/tesseract-ocr/c/8BerjYWGGQU/m/KwSz7724AQAJ)
+
+- [https://groups.google.com/g/tesseract-ocr/c/YLOkyuOMsrs/m/wEKTYtfQAAAJ](https://groups.google.com/g/tesseract-ocr/c/YLOkyuOMsrs/m/wEKTYtfQAAAJ)
+
+  
+
+HTH
+
+
+
+
+
+
+--------------------
+--------------------
+--------------------
+--------------------
+
+
+
+
+
+
+Thanks.  I figured out how to use ImageMagick to change the mottled gray to green.
+
+  ![[assets/time-green.png]]
+
+```
+
+michael@argon:~/michael/trunk/src/tides$ convert time.png -fuzz 20% -fill "green" -opaque "gray(60%)" time_green.png
+
+```
+
+```
+
+michael@argon:~/michael/trunk/src/tides$ tesseract time_green.png -  
+Estimating resolution as 147
+
+```
+
+
+
+
+
+
+
+
+
+--------------------
+--------------------
+--------------------
+--------------------
+
+
+
+
+
+
+  
+
+From: Rucha Patil
+
+Green? Why? I dont know if this might resolve the issue. Lmk the behavior I’m curious. But you need an image that has white background and black text. You can achieve this easily using cv2 functions.
+
+
+
+
+
+
+
+
+
+
+
+--------------------
+--------------------
+--------------------
+--------------------
+
+
+
+
+
+From: Ger
+
+
+  
+Indeed, why? (What is the thought that drove you to run this particular imagemagick command?)  While it might help visually debugging something you're trying, the simplest path towards "black text on white background" is 
+
+  
+
+1. converting any image to greyscale. (and see for yourself if that output is easily legible; if it's not, chances are the machine will have trouble too, so more preprocessing /before/ the greyscale transform is needed then)
+
+2. use a 'threshold' (a.k.a. binarization) step to possibly help (though tesseract can oftentimes do a better job with greyscale instead of hard black & white as there's more 'detail' in the image pixels then. YMMV).
+
+  
+
+You can do this many ways, using imagemagick is one, openCV another. For one-offs I use Krita / Photoshop filter layers (stacking the filters to get what I want). 
+
+Anything really that gets you something that approaches 'crisp dark/black text on a clean, white background, text characters about 30px high' (dpi is irrelevant, though often mentioned elsewhere: tesseract does digital image pixels, not classical printer mindset dots-per-inch). 
+
+  
+
+Note that 'simplest path towards' does not mean 'always the best way'.
+
+
+
+
+
+
+
+
+--------------------
+--------------------
+--------------------
+--------------------
+
+
+
+
+
+
+From: Michael
+
+  
+
+Rucha > Green? Why?
+
+  
+
+Ger > Indeed, why? (What is the thought that drove you to run this particular imagemagick command?)
+
+  
+
+Fair questions.  I saw both black and white in the text so I picked a background color that does not exist in the text and has high contrast.   tesseract did a great job with the green background.  I want to process images to extract Palo Alto California tide data, date, and time and then plot the results against xtide predictions.  I am close to processing a day's worth of images collected once a minute so I will see how well the green background works.  If I have problems, I will definitely try using your (Ger and Rucha's) advice.
+
+  
+
+Thank you Ger and Racha very much for your advice.
+
+  
+
+Best Regards,
+
+   Michael
+
+
+
+
+
+
+
+--------------------
+--------------------
+--------------------
+--------------------
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+From: Ger 
+
+
+
+
+I suspected something like this.
+
+  
+
+FYI a technical detail that is very relevant for your case: when somebody feeds `tesseract` a white text on dark background image, tesseract OFTEN SEEMS TO WORK. Until you think it's doing fine and you get a very hard to notice lower total quality of OCR output than with comparable white text on black background. Here's what's going on under the hood and why I emphatically advise everybody to NEVER feed `tesseract` white-text-on-black-background:
+  
+
+Tesseract code picks up your image and looks at its metadata: width, height and RGB/number of colors. Fine so far. 
+Now it goes and looks at the image pixels and runs a so-called *segmentation* process. Fundamentally, it runs its own thresholding filter over your pixels to produce a pure 0/1 black & white picture copy: this one is simpler and faster to search as tesseract applies algorithms to discover the position and size of each *box* of text: the *bounding-boxes* list. Every *b-box* (a horizontal rectangle) surrounds ［one］ ［word］ ［each］. Like I did with the square brackets ［•••］ just now. (For C++ code readers: yes, I'm skipping stuff and not being *exact* in what happens. RTFC if you want the absolute and definitive truth.)
+
+Now each of these b-boxes (bounding boxes) are clipped (*extracted*) from your source image and fed, one vertical pixel line after another, into the LSTM OCR engine, which spits out a synchronous stream of probabilities: think "30% chance that was an 'a' just now, 83% chance is was a 'd' and 57% chance I was looking at a 'b' instead. Meanwhile here's all the rest of the alphabet, but their chances are very low indeed."
+
+So the next bit of tesseract logic looks at this and picks the highest probable occurrence: 'd'. (Again, reality is way more complex than this, but this is the base of it all and very relevant for our "*don't ever do white-on-black while it might seem to work just fine right now!*"
+
+By the time tesseract has 'decoded' the perceived word in that little b-box image, it may have 'read' the word '*dank*', for example. The 'd' was just the first character in there.
+
+Meanwhile, `tesseract` ALSO has memorized the top rankings (you may have noticed that my 'probabilities' did not add up to 100%, so we call them *rankings* or *scores* instead of *probabilities*).
+It also calculated a ranking for the word as a whole, say 78% (and rankings are not real percentages so I'm lying through my teeth here. RTFC if you need that for comfort. Meanwhile I stick to the storyline here...)
+
+We're still not done: there's a tiny, *single line of code* in tesseract which now gets to look at that number. It is one of the many "*heuristics*" in there. And it says: "*if this word ranking is below 0.7 (70%), we need to TRY AGAIN: Invert(!!!) that word box image and run it through the engine once more! When you're done, compare the ranking of the word you got this second time around and may the best one win!*"
+
+For a human, the heuristic seems obvious and flawless. 
+In actual practice however, the engine can act a little crazy sometimes when it's fed horribly unexpected pixel input and there's a small but noticeable number of times where the gibberish wins because the engine got stoned as a squirrel and announced the inverted pixels have, say, a 71% ranking for nonsense '*Q0618*'. Highest bidder wins and you get gibberish (at best) or a totally incorrect word like '*quirk*' at worst: both are very wrong, but your chances of discovering the second example fault is nigh impossible, particularly when you have automated this process as you process images in bulk.
+
+Two ways (3, rather!) this has a detrimental affect on your output OCR quality:
+
+1. if you start with white-text-on-black-background, tesseract 'segmentation' has to deal with white-text-on-black-background too and my findings are: the b-boxes discovery delivers worse results. That's bad in two ways as both (2) and (3) don't receive optimal input image clippings.
+
+2. by now you will have guessed it: you started with white-text-on-black-background (white-text-on-green-background in your specific case) so the first round through tesseract is feeding it a bunch of highly unexpected 'crap' it was never taught to deal with: gibberish is the result and lots of 'words' arrive at that heuristic line with rankings way below that 0.7 benchmark, so the consequence, a second run, saves your ass by rerunning the INVERTED image and very probably observing serious winners that time, so everything LOOKS good for the test image. 
+   
+   Meanwhile, we know that the tesseract engine, like any neural net, can go nuts and output gibberish with surprising high confidence rankings: assuming your first run delivered gibberish with such a high confidence, barely or quite a lot higher than the 0.7 benchmark, you WILL NOT GET THAT SECOND RUN and thus crazy stuff will be your end result. *Ouch.*
+
+2. same as (2) but now twisted in the other direction: tesseract has a bout of self-doubt somehow (computer pixel fonts like yours are a candidate for this) and thus produces the intended word '*dank*' during the second run but at a surprisingly LOW ranking of, say, 65%, while first round gibberish had the rather idiotic ranking of 67%, still below the 0.7 benchmark but "winner takes all" has to obey and let the gibberish pass anyhow: '*dank*' scored just a wee bit lower! 
+   
+   Again, fat failure in terms of total quality of output, but it happens. Rarely, but often enough to screw you up.
+
+Of course you can argue the same from the by-design black-text-on-white-background input, so what's the real catch here?!
+
+When you ensure, BEFOREHAND, that tesseract receives black-text-on-white-background, high contrast, input images: 
+(1) will do a better job, hence reducing your total error rate. 
+(2) is a non-scenario now because your first round gets black-text-on-white-background, as everybody trained for, so no crazy confusion this way. Thus another, notable, improvement in total error rate / quality. 
+(3) still happens, but in the reverse order: the first round produces the intended '*dank*' word at low confidence (65%), so second round is run and gibberish (at 67%) wins, OUCH!, *but!* the actual probability of this scenario happening just dropped a lot as your 'not passing the benchmark' test is now dependent on the 'lacking confidence' scenario part, which is (obviously?) *rarer* than the *totally-confused-but-rather-confident* first part of the original scenario (3).
+
+Thus all 3 failure modes have a significantly lower probability of actually occurring when you feed tesseract black-text-on-white-background images, as it was designed to eat that kind of porridge.
+
+Therefor: high contrast is good. 
+Better yet: flip it around (*Invert the image colors*), possibly after having done the to-greyscale conversion yourself, as well. 
+Your images will thank you. -- ✨Bonus points!✨ Not having to execute the second run for every b-box tesseract found, means spending about half the time in the CPU-intensive neural net: higher performance and fewer errors all at the same time 🥳🥳
+
+ 
+
+Why does tesseract have that 0.7 heuristic then? That's a story for another time, but it has it's uses...
+
+
+
+
+
+
+
+
+
+
+--------------------
+--------------------
+--------------------
+--------------------
+
+
+
+
+
