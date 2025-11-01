@@ -250,75 +250,68 @@ From: Ger
 
 
 
+  
 
 I suspected something like this.
 
-  
+FYI a technical detail that is very relevant for your case: when somebody feeds `tesseract` a white text on dark background image, tesseract OFTEN SEEMS TO WORK. Until you think it's doing fine and you get a very hard to notice lower total quality of OCR output than with comparable white text on black background.  
+Here's what's going on under the hood and why I emphatically advise everybody to NEVER feed `tesseract` white-text-on-black-background:
 
-FYI a technical detail that is very relevant for your case: when somebody feeds `tesseract` a white text on dark background image, tesseract OFTEN SEEMS TO WORK. Until you think it's doing fine and you get a very hard to notice lower total quality of OCR output than with comparable white text on black background. Here's what's going on under the hood and why I emphatically advise everybody to NEVER feed `tesseract` white-text-on-black-background:
-  
+Tesseract code picks up your image and looks at its metadata: width, height and RGB/number of colors. Fine so far.  
+Now it goes and looks at the image pixels and runs a so-called _segmentation_ process.  
+Fundamentally, it runs its own thresholding filter over your pixels to produce a pure 0/1 black & white picture copy: this one is simpler and faster to search as tesseract applies algorithms to discover the position and size of each _b-box_ of text: the _bounding-boxes_ list.  
+Every _b-box_ (a horizontal rectangle) surrounds ［one］ ［word］ ［each.］ Like I did with the square brackets ［•••］ just now. (For C++ code readers: yes, I'm skipping stuff and not being _exact_ in what happens. RTFC if you want the absolute and definitive truth.)
 
-Tesseract code picks up your image and looks at its metadata: width, height and RGB/number of colors. Fine so far. 
-Now it goes and looks at the image pixels and runs a so-called *segmentation* process. Fundamentally, it runs its own thresholding filter over your pixels to produce a pure 0/1 black & white picture copy: this one is simpler and faster to search as tesseract applies algorithms to discover the position and size of each *box* of text: the *bounding-boxes* list. Every *b-box* (a horizontal rectangle) surrounds ［one］ ［word］ ［each］. Like I did with the square brackets ［•••］ just now. (For C++ code readers: yes, I'm skipping stuff and not being *exact* in what happens. RTFC if you want the absolute and definitive truth.)
+Now each of these b-boxes (bounding boxes) are clipped (_extracted_) from your source image and fed, one vertical pixel line after another, into the LSTM OCR engine, which spits out a synchronous stream of probabilities: think "30% chance that was an 'a' just now, 83% chance it was a 'd' and 57% chance I was looking at a 'b' instead. Meanwhile here's all the rest of the alphabet, but their chances are very low indeed."
 
-Now each of these b-boxes (bounding boxes) are clipped (*extracted*) from your source image and fed, one vertical pixel line after another, into the LSTM OCR engine, which spits out a synchronous stream of probabilities: think "30% chance that was an 'a' just now, 83% chance is was a 'd' and 57% chance I was looking at a 'b' instead. Meanwhile here's all the rest of the alphabet, but their chances are very low indeed."
+So the next bit of tesseract logic looks at this and picks the highest probable occurrence: 'd'. (Again, reality is way more complex than this, but this is the base of it all and very relevant for our "_don't ever do white-on-black while it might seem to work just fine right now!_"
 
-So the next bit of tesseract logic looks at this and picks the highest probable occurrence: 'd'. (Again, reality is way more complex than this, but this is the base of it all and very relevant for our "*don't ever do white-on-black while it might seem to work just fine right now!*"
+By the time tesseract has 'decoded' the perceived word in that little b-box image, it may have 'read' the word '_dank_', for example. The 'd' was just the first character in there.
 
-By the time tesseract has 'decoded' the perceived word in that little b-box image, it may have 'read' the word '*dank*', for example. The 'd' was just the first character in there.
+Meanwhile, `tesseract` ALSO has memorized the top rankings (you may have noticed that my 'probabilities' did not add up to 100%, so we call them _rankings_ or _scores_ instead of _probabilities_). It also calculated a ranking for the word as a whole, say 78% (and rankings are not real percentages so I'm lying through my teeth here. RTFC if you need that for comfort. Meanwhile I stick to the storyline here...)
 
-Meanwhile, `tesseract` ALSO has memorized the top rankings (you may have noticed that my 'probabilities' did not add up to 100%, so we call them *rankings* or *scores* instead of *probabilities*).
-It also calculated a ranking for the word as a whole, say 78% (and rankings are not real percentages so I'm lying through my teeth here. RTFC if you need that for comfort. Meanwhile I stick to the storyline here...)
+We're still not done: there's a tiny, single line of code in tesseract which now gets to look at that number. It is one of the many "_heuristics_" in there. And it says: "_if this word ranking is below 0.7 (70%), we need to TRY AGAIN: Invert(!!!) that word box image and run it through the engine once more! When you're done, compare the ranking of the word you got this second time around and may the best one win!_"
 
-We're still not done: there's a tiny, *single line of code* in tesseract which now gets to look at that number. It is one of the many "*heuristics*" in there. And it says: "*if this word ranking is below 0.7 (70%), we need to TRY AGAIN: Invert(!!!) that word box image and run it through the engine once more! When you're done, compare the ranking of the word you got this second time around and may the best one win!*"
-
-For a human, the heuristic seems obvious and flawless. 
-In actual practice however, the engine can act a little crazy sometimes when it's fed horribly unexpected pixel input and there's a small but noticeable number of times where the gibberish wins because the engine got stoned as a squirrel and announced the inverted pixels have, say, a 71% ranking for nonsense '*Q0618*'. Highest bidder wins and you get gibberish (at best) or a totally incorrect word like '*quirk*' at worst: both are very wrong, but your chances of discovering the second example fault is nigh impossible, particularly when you have automated this process as you process images in bulk.
+For a human, the heuristic seems obvious and flawless. In actual practice however, the engine can act a little crazy sometimes when it's fed horribly unexpected pixel input and there's a small but noticeable number of times where the gibberish wins because the engine got stoned as a squirrel and announced the inverted pixels have, say, a 71% ranking for nonsense '_Q0618_'. Highest bidder wins and you get gibberish (at best) or a totally incorrect word like '_quirk_' at worst: both are very wrong, but your chances of discovering the second example fault is nigh impossible, particularly when you have automated this process as you process images in bulk.
 
 Two ways (3, rather!) this has a detrimental affect on your output OCR quality:
 
 1. if you start with white-text-on-black-background, tesseract 'segmentation' has to deal with white-text-on-black-background too and my findings are: the b-boxes discovery delivers worse results. That's bad in two ways as both (2) and (3) don't receive optimal input image clippings.
-
-2. by now you will have guessed it: you started with white-text-on-black-background (white-text-on-green-background in your specific case) so the first round through tesseract is feeding it a bunch of highly unexpected 'crap' it was never taught to deal with: gibberish is the result and lots of 'words' arrive at that heuristic line with rankings way below that 0.7 benchmark, so the consequence, a second run, saves your ass by rerunning the INVERTED image and very probably observing serious winners that time, so everything LOOKS good for the test image. 
-   
-   Meanwhile, we know that the tesseract engine, like any neural net, can go nuts and output gibberish with surprising high confidence rankings: assuming your first run delivered gibberish with such a high confidence, barely or quite a lot higher than the 0.7 benchmark, you WILL NOT GET THAT SECOND RUN and thus crazy stuff will be your end result. *Ouch.*
-
-2. same as (2) but now twisted in the other direction: tesseract has a bout of self-doubt somehow (computer pixel fonts like yours are a candidate for this) and thus produces the intended word '*dank*' during the second run but at a surprisingly LOW ranking of, say, 65%, while first round gibberish had the rather idiotic ranking of 67%, still below the 0.7 benchmark but "winner takes all" has to obey and let the gibberish pass anyhow: '*dank*' scored just a wee bit lower! 
-   
+    
+2. by now you will have guessed it: you started with white-text-on-black-background (white-text-on-green-background in your specific case) so the first round through tesseract is feeding it a bunch of highly unexpected 'crap' it was never taught to deal with: gibberish is the result and lots of 'words' arrive at that heuristic line with rankings way below that 0.7 benchmark, so the consequence, the second run, saves your ass by rerunning the INVERTED image and very probably observes serious winners this time, so everything LOOKS good for the test image.
+    
+   Meanwhile, we know that the tesseract engine, like any neural net, can go nuts and output gibberish with surprising high confidence rankings: assuming your first run delivered gibberish with such a high confidence, barely or quite a lot higher than the 0.7 benchmark, you WILL NOT GET THAT SECOND RUN and thus crazy stuff will be your end result. _Ouch!_
+    
+3. same as (2) but now twisted in the other direction: tesseract has a bout of self-doubt somehow (computer pixel fonts like yours are a candidate for this) and thus produces the intended word '_dank_' during the second run but at a surprisingly LOW ranking of, say, 65%, while first round gibberish had the rather idiotic ranking of 67%, still below the 0.7 benchmark but "winner takes all" has to obey and let the gibberish pass anyhow: '_dank_' scored just a wee bit lower! _Ouch!_
+    
    Again, fat failure in terms of total quality of output, but it happens. Rarely, but often enough to screw you up.
+    
+
+  
 
 Of course you can argue the same from the by-design black-text-on-white-background input, so what's the real catch here?!
 
-When you ensure, BEFOREHAND, that tesseract receives black-text-on-white-background, high contrast, input images: 
-(1) will do a better job, hence reducing your total error rate. 
-(2) is a non-scenario now because your first round gets black-text-on-white-background, as everybody trained for, so no crazy confusion this way. Thus another, notable, improvement in total error rate / quality. 
-(3) still happens, but in the reverse order: the first round produces the intended '*dank*' word at low confidence (65%), so second round is run and gibberish (at 67%) wins, OUCH!, *but!* the actual probability of this scenario happening just dropped a lot as your 'not passing the benchmark' test is now dependent on the 'lacking confidence' scenario part, which is (obviously?) *rarer* than the *totally-confused-but-rather-confident* first part of the original scenario (3).
+When you ensure, BEFOREHAND, that tesseract receives black-text-on-white-background, high contrast, input images:  
+(1) will do a better job, hence reducing your total error rate.  
+(2) is a non-scenario now because your first round gets black-text-on-white-background, as everybody trained for, so no crazy confusion this way. Thus another, notable, improvement in total error rate / quality.  
+(3) still happens, but in the reverse order: the first round produces the intended '_dank_' word at low confidence (65%), so the second round is run and gibberish (at 67%) wins, OUCH!, _but!_ the actual probability of this scenario happening just dropped a lot as your 'not passing the benchmark' test is now dependent on the 'lacking confidence' scenario part, which is (obviously?) _rarer_ than the _totally-confused-but-rather-confident_ first part of the original scenario (3).
 
 Thus all 3 failure modes have a significantly lower probability of actually occurring when you feed tesseract black-text-on-white-background images, as it was designed to eat that kind of porridge.
 
-Therefor: high contrast is good. 
-Better yet: flip it around (*Invert the image colors*), possibly after having done the to-greyscale conversion yourself, as well. 
-Your images will thank you. -- ✨Bonus points!✨ Not having to execute the second run for every b-box tesseract found, means spending about half the time in the CPU-intensive neural net: higher performance and fewer errors all at the same time 🥳🥳
+Therefore: high contrast is good.  
+Better yet: flip it around (_Invert the image colors_), possibly after having done the to-greyscale conversion yourself, as well.  
+Your images will thank you.
 
- 
-
-Why does tesseract have that 0.7 heuristic then? That's a story for another time, but it has it's uses...
+✨Bonus points!✨ Not having to execute the second run, for every b-box tesseract found, means spending about half the time in the CPU-intensive neural net: higher performance and fewer errors all at the same time. 🥳 🥳
 
 
+  
 
+  
 
+Why does tesseract have that 0.7 heuristic then? That's a story for another time, but it has its uses...
 
+  
 
-
-
-
-
---------------------
---------------------
---------------------
---------------------
-
-
-
-
+  
 
