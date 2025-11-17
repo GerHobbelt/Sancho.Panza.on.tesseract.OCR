@@ -262,9 +262,9 @@ Now it goes and looks at the image pixels and runs a so-called _segmentation_ 
 Fundamentally, it runs its own thresholding filter over your pixels to produce a pure 0/1 black & white picture copy: this one is simpler and faster to search as tesseract applies algorithms to discover the position and size of each _b-box_ of text: the _bounding-boxes_ list.  
 Every _b-box_ (a horizontal rectangle) surrounds ［one］ ［word］ ［each.］ Like I did with the square brackets ［•••］ just now. (For C++ code readers: yes, I'm skipping stuff and not being _exact_ in what happens. RTFC if you want the absolute and definitive truth.)
 
-Now each of these b-boxes (bounding boxes) are clipped (_extracted_) from your source image and fed, one vertical pixel line after another, into the LSTM OCR engine, which spits out a synchronous stream of probabilities: think "30% chance that was an 'a' just now, 83% chance it was a 'd' and 57% chance I was looking at a 'b' instead. Meanwhile here's all the rest of the alphabet, but their chances are very low indeed."
+Now each of these b-boxes (bounding boxes) are clipped (_extracted_) from your source image and fed, one vertical pixel line after another, into the LSTM OCR engine, which spits out a synchronous stream of probabilities: think "*30% chance that was an 'a' just now, 83% chance it was a 'd' and 57% chance I was looking at a 'b' instead. Meanwhile here's all the rest of the alphabet, but their chances are very low indeed.*"
 
-So the next bit of tesseract logic looks at this and picks the highest probable occurrence: 'd'. (Again, reality is way more complex than this, but this is the base of it all and very relevant for our "_don't ever do white-on-black while it might seem to work just fine right now!_"
+So the next bit of tesseract logic looks at this and picks the highest probable occurrence: 'd'. (Again, reality is way more complex than this, but this is the base of it all and very relevant for our "_don't ever do white-on-black while it might seem to work just fine right now!_")
 
 By the time tesseract has 'decoded' the perceived word in that little b-box image, it may have 'read' the word '_dank_', for example. The 'd' was just the first character in there.
 
